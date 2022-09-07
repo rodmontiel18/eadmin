@@ -8,7 +8,7 @@ This project was build to help you to have a better control of your income and e
 - You have some charts into each period, so you can view a general overview of you balance
 
 ## Features/Technologies
-- The application was build with ReactJS with TypeScript and AntDesign as design system
+- The application was build with ReactJS, TypeScript and AntDesign as design system
 - Uses Firestore database
 - Uses Firebase authentication
 - Uses Redux Toolkit for state management and React Router for routing
