@@ -1,0 +1,6 @@
+.layoutWrapper {
+  z-index: 2000;
+  [class~='ant-spin'] {
+    max-height: 100% !important;
+  }
+}

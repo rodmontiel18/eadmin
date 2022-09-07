@@ -1,0 +1,58 @@
+.graphContainer {
+  padding: 10px;
+  .mainGraphsContainer {
+    > [class~='ant-card'] {
+      border: none;
+      > [class~='ant-card-head'] {
+        border: none;
+        [class~='ant-card-head-title'] {
+          padding-bottom: 5px;
+        }
+      }
+      > [class~='ant-card-body'] {
+        padding: 0 !important;
+      }
+    }
+    .generalGraph,
+    .outcomesGraph,
+    .incomesGraph {
+      margin: 0 auto;
+      margin-bottom: 20px;
+      max-width: 500px;
+      h3 {
+        text-align: center;
+      }
+      .graph {
+        margin-bottom: 10px;
+      }
+      .graphFooter {
+        text-align: center;
+        span {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.actionsContainer {
+  bottom: 22px;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  margin-left: -10px;
+  max-width: 1200px;
+  position: fixed;
+  width: 100%;
+
+  .backIcon {
+    margin-left: 22px;
+    text-align: start;
+    span {
+      background-color: #d3d3d3;
+      border-radius: 50%;
+      color: #2591fc;
+      font-size: 48px;
+      padding: 5px;
+    }
+  }
+}

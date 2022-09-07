@@ -1,0 +1,18 @@
+.headerMenu {
+  background-color: lightgray;
+  height: 52px;
+  font-size: 16px;
+
+  > span {
+    left: 65px;
+    position: relative;
+    top: 13px;
+  }
+
+  a {
+    cursor: pointer;
+    &:visited {
+      text-decoration: none;
+    }
+  }
+}

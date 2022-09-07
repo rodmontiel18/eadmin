@@ -1,0 +1,167 @@
+@import '~antd/dist/antd.css';
+
+html,
+body {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}
+
+#root {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  height: 100%;
+}
+
+/*.ant-spin-nested-loading {
+  position: unset !important;
+} */
+
+.ant-table-tbody tr:hover {
+  cursor: pointer;
+}
+
+.ant-layout {
+  width: 100%;
+  height: 100%;
+}
+
+.ant-layout-header {
+  padding: 0;
+  width: 100%;
+}
+
+.ant-layout-content {
+  height: 100%;
+}
+
+.ant-layout-footer {
+  bottom: 0;
+  height: 32px;
+  left: 2.5%;
+  padding: 5px;
+  position: fixed;
+  text-align: center;
+  width: 95%;
+}
+
+.ant-layout-sider {
+  position: fixed;
+  overflow: auto;
+  right: 0;
+  width: 200px;
+  z-index: 98;
+  height: 100vh;
+}
+
+.ant-spin-container,
+.ant-spin-nested-loading {
+  height: 100%;
+}
+
+.menuButton {
+  background-color: #d3d3d3 !important;
+  border: none;
+  box-shadow: none;
+  color: #1890ff !important;
+  height: 42px;
+  position: fixed;
+  top: 5px;
+  width: 45px;
+  z-index: 99;
+}
+
+.menuButton span {
+  font-size: 33px;
+  margin-left: -7px;
+}
+
+/* .ant-menu */
+.ant-menu .ant-menu-item:first {
+  margin-top: 0;
+}
+
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-item {
+  padding: 4px 16px;
+}
+
+/* .ant-menu E */
+
+/* .ant-list-item */
+.ant-list-item {
+  margin-top: 16px;
+}
+/* .ant-list-item E */
+
+/* Tabs */
+
+.ant-tabs-top > .ant-tabs-nav {
+  margin: 0;
+}
+
+.ant-tabs-nav-list {
+  background-color: white;
+  border-radius: 10px 10px 0 0;
+}
+
+.ant-tabs-tab {
+  padding: 10px;
+}
+
+.ant-tabs-tab + .ant-tabs-tab {
+  margin: 0;
+}
+
+.ant-tabs-content-holder {
+  background-color: white;
+  border-radius: 0 10px 10px 10px;
+}
+
+/* Tabs E */
+
+/* Cards */
+.ant-card-bordered {
+  border: 1px solid #cac0c0;
+  border-radius: 3px;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #cac0c0;
+}
+
+.ant-card-body {
+  padding: 15px !important;
+}
+
+/* Cards E */
+
+.main-container {
+  height: 100%;
+  width: 100%;
+}
+
+.root-content-container {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.container {
+  padding: 10px;
+  max-height: 83vh;
+}

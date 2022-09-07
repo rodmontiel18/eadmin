@@ -1,0 +1,127 @@
+.outcomesGLInnerContainer {
+  .groupListContainer {
+    overflow: auto;
+
+    [class~='ant-row'] {
+      width: 100%;
+    }
+  }
+
+  .mainListCard {
+    > [class~='ant-card'] {
+      border: none;
+      > [class~='ant-card-head'] {
+        border: none;
+        [class~='ant-card-head-title'] {
+          padding-bottom: 5px;
+        }
+      }
+      > [class~='ant-card-body'] {
+        padding: 0 !important;
+      }
+    }
+  }
+
+  .actionsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+
+    .addIcon span {
+      background-color: #d3d3d3;
+      border-radius: 50%;
+      color: #2591fc;
+      font-size: 48px;
+      padding: 5px;
+    }
+  }
+
+  .outcomeGroupCard {
+    text-align: center;
+    &:hover {
+      cursor: pointer;
+    }
+    span {
+      font-weight: bold;
+    }
+
+    .cardActions {
+      font-size: 20px;
+      float: right;
+      margin-top: 2px;
+    }
+
+    [class~='ant-card-head-title'] {
+      text-align: left;
+    }
+
+    .head {
+      align-items: center;
+      display: grid;
+      grid-template-columns: auto 30px;
+      padding: 0 0 0 10px;
+      text-align: center;
+
+      > div {
+        font-size: 16px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .formContainer {
+    &.error {
+      label {
+        color: red;
+      }
+
+      .input {
+        border: solid 1px red;
+      }
+
+      .msgContainer {
+        span {
+          color: red;
+          display: block;
+        }
+      }
+    }
+
+    .periodContainer {
+      align-items: center;
+      display: grid;
+      grid-template-columns: 50px 200px;
+    }
+
+    .msgContainer {
+      display: grid;
+      grid-template-columns: 50px auto;
+
+      span {
+        display: none;
+        margin-top: 5px;
+      }
+    }
+  }
+
+  [class~='ant-card-head'] {
+    padding: 0 3px 0 0;
+    text-align: center;
+  }
+
+  [class~='ant-card-head-title'] {
+    white-space: unset;
+  }
+
+  [class~='ant-list-item'] {
+    margin-top: 5px;
+  }
+}
+
+.outcomeDC {
+  margin-top: 53px;
+  padding: 0 10px 100px 10px;
+}

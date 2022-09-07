@@ -1,0 +1,93 @@
+.paymentMContainer {
+  padding: 50px 10px 100px 10px;
+  .paymentMInnerC {
+    background-color: white;
+    padding: 0 5px 5px 5px;
+
+    .formContainer {
+      &.error {
+        label {
+          color: red;
+        }
+
+        .input {
+          border: solid 1px red;
+        }
+
+        .msgContainer {
+          span {
+            color: red;
+            display: block;
+          }
+        }
+      }
+
+      .nameContainer {
+        align-items: center;
+        display: grid;
+        grid-template-columns: 50px auto;
+      }
+
+      .msgContainer {
+        display: grid;
+        grid-template-columns: 50px auto;
+
+        span {
+          display: none;
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .innerListContainer {
+      align-items: center;
+      display: grid;
+      grid-template-columns: auto 30px;
+      padding: 0 5%;
+      width: 100%;
+    }
+
+    .deleteIcon {
+      color: red;
+      float: right;
+      margin: 0 10px;
+    }
+    [class~='ant-list-item'] {
+      border: 1px solid lightgray !important;
+      border-radius: 5px;
+    }
+
+    [class~='ant-list-item']:hover {
+      cursor: pointer;
+    }
+    > [class~='ant-card'] {
+      border: none;
+      > [class~='ant-card-head'] {
+        border: none;
+        [class~='ant-card-head-title'] {
+          padding-bottom: 5px;
+        }
+      }
+      > [class~='ant-card-body'] {
+        padding: 0 !important;
+      }
+    }
+  }
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+
+  .addIcon span {
+    background-color: #d3d3d3;
+    border-radius: 50%;
+    color: #2591fc;
+    font-size: 48px;
+    padding: 5px;
+  }
+}
