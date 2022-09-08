@@ -1,4 +1,4 @@
-# Expenses Administrator
+# Expenses Control
 
 This project can help you to have a better control of your income and expenses, the project was build to save data in the browser memory, in order to reduce the number of requests to firestore, so, does not make petitions in every switch of route.
 
