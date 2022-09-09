@@ -39,16 +39,19 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
   const userId = useAppSelector(selectUser)?.uid || '';
 
   useEffect(() => {
-    if (incomes === undefined && outcomes === undefined) {
+    if (
+      (!incomes || incomes.length < 1) &&
+      (!outcomes || outcomes.length < 1)
+    ) {
       Promise.allSettled([
         dispatch(getUserOutcomesAction({ parentItemId: periodId, userId })),
         dispatch(getUserIncomesAction({ parentItemId: periodId, userId })),
       ]);
     } else {
-      if (incomes === undefined) {
+      if (!incomes || incomes.length < 1) {
         dispatch(getUserIncomesAction({ parentItemId: periodId, userId }));
       }
-      if (outcomes === undefined) {
+      if (!outcomes || outcomes.length < 1) {
         dispatch(getUserOutcomesAction({ parentItemId: periodId, userId }));
       }
     }

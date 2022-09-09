@@ -106,18 +106,15 @@ const getDbFunctions = <T extends GenericItem>(
       const querySnap = await getDocs(
         query(collection, where('userId', '==', userId))
       );
+      response.status = 200;
+      items = [];
       if (!querySnap.empty) {
-        items = [];
         querySnap.forEach(itemSnap => {
           if (itemSnap.exists())
             items.push({ ...itemSnap.data(), id: itemSnap.id });
         });
-        response.entity = items;
-        response.status = 200;
-      } else {
-        response.error = 'Not found';
-        response.status = 404;
       }
+      response.entity = items;
     } catch (error) {
       console.error(error);
       response.error = `${error}`;

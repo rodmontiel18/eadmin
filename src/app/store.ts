@@ -6,6 +6,12 @@ import paymentMethodReducer from './redux/paymentMethod/paymentMethodSlice';
 import periodReducer from './redux/period/periodSlice';
 
 export const store = configureStore({
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['app/login/fulfilled'],
+      },
+    }),
   reducer: {
     app: appReducer,
     category: categoryReducer,

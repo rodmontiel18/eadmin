@@ -35,7 +35,7 @@ const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (periods === undefined) {
+    if (!periods || periods.length < 1) {
       dispatch(
         getUserPeriodsAction({
           userId,

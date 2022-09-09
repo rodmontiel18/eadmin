@@ -129,22 +129,18 @@ export const getUserOutcomesAction = createAsyncThunk<
     try {
       if (params.parentItemId) {
         const outcomeCollection = getCollection(params.parentItemId);
-        let items: Outcome[] = [];
+        const items: Outcome[] = [];
         const querySnap = await getDocs(
           query(outcomeCollection, where('userId', '==', params.userId))
         );
         resp.status = 200;
         if (!querySnap.empty) {
-          items = [];
           querySnap.forEach(itemSnap => {
             if (itemSnap.exists())
               items.push({ ...itemSnap.data(), id: itemSnap.id });
           });
-          resp.entity = items;
-          resp.status = 200;
-        } else {
-          resp.entity = [];
         }
+        resp.entity = items;
       }
     } catch (error) {
       console.error(error);
@@ -218,8 +214,8 @@ export const deleteUserOutcomeGroupAction = createAsyncThunk<
       const periodRef = doc(db, COLLECTION_NAME, outcomeGroupId);
       if (periodRef.id) batch.delete(periodRef);
       await batch.commit();
-      resp.entityId = outcomeGroupId;
       resp.status = 200;
+      resp.entityId = outcomeGroupId;
     } catch (error) {
       resp.error = `${error}`;
       console.log(error);
@@ -230,6 +226,7 @@ export const deleteUserOutcomeGroupAction = createAsyncThunk<
 
 export const {
   addUserItemAction: addUserOutcomeGroupAction,
+  getUserItemByIdAction: getUserOutcomeGroupByIdAction,
   getUserItemsAction: getUserOutcomeGroupsAction,
   setUserItemAction: setUserOutcomeGroupAction,
 } = getExtraReducers<OutcomeGroup>(COLLECTION_NAME);
@@ -267,12 +264,12 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copy: Outcome[] = state.outcomes || [];
           const currentOutcome = action.payload.entity as Outcome | undefined;
           if (currentOutcome) {
             copy.push(currentOutcome);
             state.outcomes = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -290,6 +287,7 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copy: OutcomeGroup[] = state.outcomeGroups || [];
           const currentOutcomeGroup = action.payload.entity as
             | OutcomeGroup
@@ -297,7 +295,6 @@ export const outcomeGroupSlice = createSlice({
           if (currentOutcomeGroup) {
             copy.push(currentOutcomeGroup);
             state.outcomeGroups = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -315,13 +312,13 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { outcomes } = state;
           const id = action.payload.entityId;
           const copy = outcomes ? [...outcomes] : [];
           const outcomeIndex = copy.findIndex(o => o.id === id);
           copy.splice(outcomeIndex, 1);
           state.outcomes = copy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -338,6 +335,7 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { outcomeGroups, outcomes } = state;
           const groupId = action.payload.entityId;
           if (outcomes) {
@@ -350,7 +348,6 @@ export const outcomeGroupSlice = createSlice({
           const outcomeGroupIndex = copy.findIndex(p => p.id === groupId);
           copy.splice(outcomeGroupIndex, 1);
           state.outcomeGroups = copy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -367,11 +364,11 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const outcomesCopy = state.outcomes ? [...state.outcomes] : [];
           const respOutcomes = action.payload.entity as Outcome[] | undefined;
           if (respOutcomes) {
             state.outcomes = [...outcomesCopy, ...respOutcomes];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -389,12 +386,12 @@ export const outcomeGroupSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const respOutcomeGroups = action.payload.entity as
             | OutcomeGroup[]
             | undefined;
           if (respOutcomeGroups) {
             state.outcomeGroups = [...respOutcomeGroups];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -414,6 +411,7 @@ export const outcomeGroupSlice = createSlice({
         state.error = true;
         const copy: Outcome[] = state.outcomes || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentOutcome = action.payload.entity as Outcome | undefined;
           if (currentOutcome) {
             const outcomeIndex = copy.findIndex(
@@ -423,7 +421,6 @@ export const outcomeGroupSlice = createSlice({
               copy.splice(outcomeIndex, 1, currentOutcome);
               state.outcomes = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -444,6 +441,7 @@ export const outcomeGroupSlice = createSlice({
         state.error = true;
         const copy: OutcomeGroup[] = state.outcomeGroups || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentOutcomeGroup = action.payload.entity as
             | OutcomeGroup
             | undefined;
@@ -455,7 +453,6 @@ export const outcomeGroupSlice = createSlice({
               copy.splice(outcomeGroupIndex, 1, currentOutcomeGroup);
               state.outcomeGroups = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -500,6 +497,10 @@ export const selectOutcomeGroup = createSelector(
   getOutcomeGroupState,
   o => o.outcomeGroup
 );
+export const selectOutcomeGroupById = (outcomeGroupId: string) =>
+  createSelector(getOutcomeGroupState, o =>
+    o.outcomeGroups?.find(o => o.id === outcomeGroupId)
+  );
 export const selectRequestStatus = createSelector(
   getOutcomeGroupState,
   o => o.requestStatus

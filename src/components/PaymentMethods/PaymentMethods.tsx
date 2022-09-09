@@ -44,7 +44,7 @@ const PaymentMethods: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (pMethods === undefined) {
+    if (!pMethods || pMethods.length < 1) {
       dispatch(
         getUserPaymentMethodsAction({
           userId,

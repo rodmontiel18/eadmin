@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, notification, Space } from 'antd';
+import { Button, DatePicker, Form, Input, notification } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import moment, { Moment } from 'moment';
 import { FC, useEffect } from 'react';
@@ -20,7 +20,7 @@ interface PeriodFormProps {
 
 interface PeriodFormInputs {
   name: string;
-  rangeDates: Moment[];
+  rangeDates: [Moment, Moment];
 }
 
 const PeriodForm: FC<PeriodFormProps> = ({
@@ -102,9 +102,7 @@ const PeriodForm: FC<PeriodFormProps> = ({
         name="rangeDates"
         rules={[{ required: true, message: 'Range date is mandatory' }]}
       >
-        <Space direction="vertical" size={12}>
-          <DatePicker.RangePicker inputReadOnly size="small" />
-        </Space>
+        <DatePicker.RangePicker inputReadOnly size="small" />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Button

@@ -50,12 +50,10 @@ const Layout: React.FC<AuxProps> = () => {
         } else {
           dispatch(setUser({ email: null, displayName: null, uid: null }));
           Cookies.remove('token', { path: '/' });
-          navigate('/signin');
         }
       } else {
         dispatch(setUser({ email: null, displayName: null, uid: null }));
         Cookies.remove('token', { path: '/' });
-        navigate('/signin');
       }
     });
 
@@ -63,9 +61,14 @@ const Layout: React.FC<AuxProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (!cookieToken && location.pathname.indexOf('signin') < 0) {
+    if (
+      !cookieToken &&
+      (!user || !user.uid) &&
+      location.pathname.indexOf('signin') < 0
+    ) {
       dispatch(logout());
       navigate('/signin');
+      window.location.reload();
     }
   }, [cookieToken]);
 
