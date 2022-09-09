@@ -1,46 +1,42 @@
-# Getting Started with Create React App
+# Expenses Control
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) TS template.
+This project can help you to have a better control of your income and expenses, the project was build to save data in the browser memory, in order to reduce the number of requests to firestore, so, does not make petitions in every switch of route.
 
-## Available Scripts
+## Features
+- Add/remove/edit categories for both income and expenses
+- Add/remove/edit payment methods for your expenses
+- You can add/remove/edit periods where you can add both incomes and expenses between a range of dates
+- Into periods, you can add/remove/edit income and expenses, you can filter and sort for some criteria in the income and expenses table
+- You can add/remove/edit groups of expenses in order to add them faster to a period
+- You have some charts into each period, so you can view a general overview of you balance
 
-In the project directory, you can run:
+## Technologies
+- The application was build with ReactJS, TypeScript and AntDesign as design system
+- Uses Firestore database
+- Uses Firebase authentication
+- Uses Redux Toolkit for state management and React Router for routing
+- Was built with create-react-app
+- Uses ESLint
 
-### `yarn start`
+***Note:*** *This project has disabled Signup, so it requires to add a user manually*
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## How to run it
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Prerequisites
+1. You need to sign in [here](https://firebase.google.com/) with your Google Account 
+2. You'll need to create a new project, new App, and add a firestore database in ***test mode***, you can follow the two first step of [this](https://firebase.google.com/docs/web/setup) Get started guide
+4. You'll need to add the authentication module and add ***Email/Password*** provider
+   - Add a user, set email and password
 
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Instructions
+1. Checkout the repository
+2. From your firebase project settings/ App get the required data from SDK configuration and add it into ***.env*** file, for the next vars:
+   - REACT_APP_API_KEY
+   - REACT_APP_AUTH_DOMAIN
+   - REACT_APP_PROJECT_ID
+   - REACT_APP_MESSAGING_SENDER_ID
+   - REACT_APP_APP_ID
+3. Install dependencies with ***yarn*** or ***npm i***
+4. Run start script with ***yarn start*** or ***npm run start***, the application should launch your browser on https://localhost:3000, otherwise, you can go manually
+5. Enter email and password of the user created on the 4th prerequisites step
+6. Enjoy it!

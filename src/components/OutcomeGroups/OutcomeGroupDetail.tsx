@@ -6,7 +6,6 @@ import { Link, useParams } from 'react-router-dom';
 import {
   getUserOutcomeGroupsAction,
   selectError,
-  selectOutcomeGroup,
   selectOutcomeGroupById,
 } from '../../app/redux/outcomeGroup/outcomeGroupSlice';
 import {
