@@ -46,7 +46,7 @@ const Categories: FC = () => {
         })
       );
     }
-  }, [categories]);
+  }, []);
 
   useEffect(() => {
     if (
