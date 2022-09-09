@@ -114,9 +114,6 @@ const getDbFunctions = <T extends GenericItem>(
         });
         response.entity = items;
         response.status = 200;
-      } else {
-        response.error = 'Not found';
-        response.status = 404;
       }
     } catch (error) {
       console.error(error);
