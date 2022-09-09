@@ -212,22 +212,18 @@ export const getUserIncomesAction = createAsyncThunk<
           params.parentItemId,
           INCOME_COLLECTION_NAME
         );
-        let items: Income[] = [];
+        const items: Income[] = [];
         const querySnap = await getDocs(
           query(incomeCollection, where('userId', '==', params.userId))
         );
         resp.status = 200;
         if (!querySnap.empty) {
-          items = [];
           querySnap.forEach(itemSnap => {
             if (itemSnap.exists())
               items.push({ ...itemSnap.data(), id: itemSnap.id });
           });
-          resp.entity = items;
-          resp.status = 200;
-        } else {
-          resp.entity = [];
         }
+        resp.entity = items;
       }
     } catch (error) {
       console.error(error);
@@ -254,22 +250,18 @@ export const getUserOutcomesAction = createAsyncThunk<
           params.parentItemId,
           OUTCOME_COLLECTION_NAME
         );
-        let items: Outcome[] = [];
+        const items: Outcome[] = [];
         const querySnap = await getDocs(
           query(outcomeCollection, where('userId', '==', params.userId || ''))
         );
         resp.status = 200;
         if (!querySnap.empty) {
-          items = [];
           querySnap.forEach(itemSnap => {
             if (itemSnap.exists())
               items.push({ ...itemSnap.data(), id: itemSnap.id });
           });
-          resp.entity = items;
-          resp.status = 200;
-        } else {
-          resp.entity = [];
         }
+        resp.entity = items;
       }
     } catch (error) {
       console.error(error);
@@ -533,6 +525,7 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           let copy: Outcome[] = state.outcomes || [];
           const currentOutcomes = action.payload.entity as
             | Outcome[]
@@ -540,7 +533,6 @@ export const periodSlice = createSlice({
           if (currentOutcomes && currentOutcomes.length > 0) {
             copy = [...copy, ...currentOutcomes];
             state.outcomes = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -558,12 +550,12 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copy: Income[] = state.incomes || [];
           const currentIncome = action.payload.entity as Income | undefined;
           if (currentIncome) {
             copy.push(currentIncome);
             state.incomes = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -581,12 +573,12 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copy: Outcome[] = state.outcomes || [];
           const currentOutcome = action.payload.entity as Outcome | undefined;
           if (currentOutcome) {
             copy.push(currentOutcome);
             state.outcomes = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -604,12 +596,12 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copy: Period[] = state.periods || [];
           const currentPeriod = action.payload.entity as Period | undefined;
           if (currentPeriod) {
             copy.push(currentPeriod);
             state.periods = copy;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -627,11 +619,11 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { incomes } = state;
           const id = action.payload.entityId;
           const copy = incomes ? [...incomes.filter(i => i.id !== id)] : [];
           state.incomes = copy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -648,11 +640,11 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { outcomes } = state;
           const id = action.payload.entityId;
           const copy = outcomes ? [...outcomes.filter(o => o.id !== id)] : [];
           state.outcomes = copy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -669,6 +661,7 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const periodId = action.payload.entityId;
           const { incomes, periods, outcomes } = state;
           if (incomes) {
@@ -687,7 +680,6 @@ export const periodSlice = createSlice({
             ? [...periods.filter(p => p.id !== periodId)]
             : [];
           state.periods = periodsCopy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -704,11 +696,11 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const incomesCopy = state.incomes ? [...state.incomes] : [];
           const respIncomes = action.payload.entity as Income[] | undefined;
           if (respIncomes) {
             state.incomes = [...respIncomes, ...incomesCopy];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -726,11 +718,11 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const outcomesCopy = state.outcomes ? [...state.outcomes] : [];
           const respOutcomes = action.payload.entity as Outcome[] | undefined;
           if (respOutcomes) {
             state.outcomes = [...respOutcomes, ...outcomesCopy];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -750,10 +742,10 @@ export const periodSlice = createSlice({
         state.error = true;
         const currentPeriods = (state.periods || []) as Period[];
         if (action.payload.status === 200) {
+          state.error = false;
           const respPeriod = action.payload.entity as Period | undefined;
           if (respPeriod) {
             state.periods = [...currentPeriods, respPeriod];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -771,10 +763,10 @@ export const periodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const respPeriods = action.payload.entity as Period[] | undefined;
           if (respPeriods) {
             state.periods = [...respPeriods];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -794,6 +786,7 @@ export const periodSlice = createSlice({
         state.error = true;
         const copy: Income[] = state.incomes || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentIncome = action.payload.entity as Income | undefined;
           if (currentIncome) {
             const incomeIndex = copy.findIndex(o => o.id === currentIncome.id);
@@ -801,7 +794,6 @@ export const periodSlice = createSlice({
               copy.splice(incomeIndex, 1, currentIncome);
               state.incomes = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -822,6 +814,7 @@ export const periodSlice = createSlice({
         state.error = true;
         const copy: Outcome[] = state.outcomes || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentOutcome = action.payload.entity as Outcome | undefined;
           if (currentOutcome) {
             const outcomeIndex = copy.findIndex(
@@ -831,7 +824,6 @@ export const periodSlice = createSlice({
               copy.splice(outcomeIndex, 1, currentOutcome);
               state.outcomes = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -852,6 +844,7 @@ export const periodSlice = createSlice({
         state.error = true;
         const copy: Period[] = state.periods || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentPeriod = action.payload.entity as Period | undefined;
           if (currentPeriod) {
             const periodIndex = copy.findIndex(p => p.id === currentPeriod.id);
@@ -859,7 +852,6 @@ export const periodSlice = createSlice({
               copy.splice(periodIndex, 1, currentPeriod);
               state.periods = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }

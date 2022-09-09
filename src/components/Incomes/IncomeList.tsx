@@ -41,7 +41,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
   const requestStatus = useAppSelector(selectRequestStatus);
 
   useEffect(() => {
-    if (incomes === undefined) {
+    if (!incomes || incomes?.length < 1) {
       dispatch(
         getUserIncomesAction({
           parentItemId: periodId,
@@ -178,7 +178,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
           />
         </Modal>
         <div className={styles.mainTableCard}>
-          <Card title={<h1>Incomes</h1>}>
+          <Card title={<h2>Incomes</h2>}>
             <Table
               bordered
               columns={cols}

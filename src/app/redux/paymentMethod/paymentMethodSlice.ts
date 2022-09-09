@@ -58,6 +58,7 @@ export const paymentMethodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copyPM: PaymentMethod[] = state.paymentMethods || [];
           const paymentMethod = action.payload.entity as
             | PaymentMethod
@@ -65,7 +66,6 @@ export const paymentMethodSlice = createSlice({
           if (paymentMethod) {
             copyPM.push(paymentMethod);
             state.paymentMethods = copyPM;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -83,12 +83,12 @@ export const paymentMethodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const respPaymentMethods = action.payload.entity as
             | PaymentMethod[]
             | undefined;
           if (respPaymentMethods) {
             state.paymentMethods = [...respPaymentMethods];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -108,6 +108,7 @@ export const paymentMethodSlice = createSlice({
         state.error = true;
         const copy: PaymentMethod[] = state.paymentMethods || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentPaymentMethod = action.payload.entity as
             | PaymentMethod
             | undefined;
@@ -119,7 +120,6 @@ export const paymentMethodSlice = createSlice({
               copy.splice(paymentMethodIndex, 1, currentPaymentMethod);
               state.paymentMethods = copy;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -138,13 +138,13 @@ export const paymentMethodSlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { paymentMethods } = state;
           const id = action.payload.entityId;
           const copy = paymentMethods ? [...paymentMethods] : [];
           const paymentMethodIndex = copy.findIndex(p => p.id === id);
           copy.splice(paymentMethodIndex, 1);
           state.paymentMethods = copy;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -168,7 +168,6 @@ export const selectPaymentMethods = createSelector(getPaymentMethodState, p => {
   const sortedPaymentMethods = (
     p.paymentMethods ? [...p.paymentMethods] : []
   )?.sort((a: PaymentMethod, b: PaymentMethod) => a.name.localeCompare(b.name));
-  if (sortedPaymentMethods.length < 1) return undefined;
   return sortedPaymentMethods;
 });
 export const selectError = createSelector(getPaymentMethodState, p => p.error);

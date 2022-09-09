@@ -39,7 +39,7 @@ const Categories: FC = () => {
   const userId = user?.uid || '';
 
   useEffect(() => {
-    if (categories === undefined) {
+    if (categories.length < 1) {
       dispatch(
         getUserCategoriesAction({
           userId,

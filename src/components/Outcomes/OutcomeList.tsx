@@ -73,7 +73,10 @@ const OutcomeList: FC<OutcomeListProps> = ({
   const userId = useAppSelector(selectUser)?.uid || '';
 
   useEffect(() => {
-    if (outcomes === undefined && pMethods === undefined) {
+    if (
+      (!outcomes || outcomes.length < 1) &&
+      (!pMethods || pMethods.length < 1)
+    ) {
       Promise.allSettled([
         handleGetOutcomesAction(),
         dispatch(
@@ -83,10 +86,10 @@ const OutcomeList: FC<OutcomeListProps> = ({
         ),
       ]);
     } else {
-      if (outcomes === undefined) {
+      if (!outcomes || outcomes.length < 1) {
         handleGetOutcomesAction();
       }
-      if (pMethods === undefined) {
+      if (!pMethods || pMethods.length < 1) {
         dispatch(
           getUserPaymentMethodsAction({
             userId,
@@ -368,7 +371,7 @@ const OutcomeList: FC<OutcomeListProps> = ({
             </Modal>
           )}
           <div className={styles.mainTableCard}>
-            <Card title={<h1>Outcomes</h1>}>
+            <Card title={<h2>Outcomes</h2>}>
               <Table
                 bordered
                 columns={cols}

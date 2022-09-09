@@ -22,6 +22,7 @@ import {
   selectPeriodById,
 } from '../../app/redux/period/periodSlice';
 import IncomeList from '../Incomes/IncomeList';
+import moment from 'moment';
 
 enum PeriodTabs {
   Outcomes = 1,
@@ -54,7 +55,7 @@ const PeriodDetail = () => {
       );
       setSearchParams([tabParam]);
 
-      if (categories === undefined) {
+      if (categories.length < 1) {
         dispatch(
           getUserCategoriesAction({
             userId,
@@ -67,6 +68,10 @@ const PeriodDetail = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (categories && categories.length === 0) handleSetLoading(false);
+  }, [categories]);
 
   useEffect(() => {
     if (error) {
@@ -103,6 +108,13 @@ const PeriodDetail = () => {
   if (categories && categories?.length > 0) {
     return (
       <div className={styles.periodDContainer}>
+        <h1>{period?.name}</h1>
+        <div style={{ textAlign: 'center' }}>
+          <span>
+            {moment.unix(period?.from || 0).format('L')} -{' '}
+            {moment.unix(period?.to || 0).format('L')}
+          </span>
+        </div>
         <Tabs defaultActiveKey={`${activeTab}`} onChange={handleOnChangeTab}>
           <Tabs.TabPane key={`${PeriodTabs.Outcomes}`} tab="Outcomes">
             <div className={styles.periodDOutcomesListC}>

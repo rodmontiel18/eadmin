@@ -61,7 +61,11 @@ const Layout: React.FC<AuxProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (!cookieToken && location.pathname.indexOf('signin') < 0) {
+    if (
+      !cookieToken &&
+      (!user || !user.uid) &&
+      location.pathname.indexOf('signin') < 0
+    ) {
       dispatch(logout());
       navigate('/signin');
       window.location.reload();

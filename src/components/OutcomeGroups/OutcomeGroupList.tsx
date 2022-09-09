@@ -61,7 +61,7 @@ const OutcomeGroupList: FC<OutcomeGroupListProps> = ({
   const periods = useAppSelector(selectPeriods);
 
   useEffect(() => {
-    if (periods === undefined && groups === undefined) {
+    if ((!periods || periods.length < 1) && (!groups || groups.length < 1)) {
       Promise.allSettled([
         dispatch(
           getUserOutcomeGroupsAction({
@@ -75,14 +75,14 @@ const OutcomeGroupList: FC<OutcomeGroupListProps> = ({
         ),
       ]);
     } else {
-      if (periods === undefined) {
+      if (!periods || periods.length < 1) {
         dispatch(
           getUserPeriodsAction({
             userId,
           })
         );
       }
-      if (groups === undefined) {
+      if (!groups || groups.length < 1) {
         dispatch(
           getUserOutcomeGroupsAction({
             userId,

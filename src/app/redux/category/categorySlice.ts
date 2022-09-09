@@ -62,12 +62,12 @@ export const categorySlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const copyCats: Category[] = state.categories || [];
           const category = action.payload.entity as Category | undefined;
           if (category) {
             copyCats.push(category);
             state.categories = copyCats;
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -85,12 +85,12 @@ export const categorySlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200) {
+          state.error = false;
           const respCategories = action.payload.entity as
             | Category[]
             | undefined;
           if (respCategories) {
             state.categories = [...respCategories];
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -110,6 +110,7 @@ export const categorySlice = createSlice({
         state.error = true;
         const copyCats: Category[] = state.categories || [];
         if (action.payload.status === 200) {
+          state.error = false;
           const currentCategory = action.payload.entity as Category | undefined;
           if (currentCategory) {
             const categoryIndex = copyCats.findIndex(
@@ -119,7 +120,6 @@ export const categorySlice = createSlice({
               copyCats.splice(categoryIndex, 1, currentCategory);
               state.categories = copyCats;
             }
-            state.error = false;
             state.requestStatus = RequestStatus.SUCCEEDED;
           }
         }
@@ -138,13 +138,13 @@ export const categorySlice = createSlice({
         state.requestStatus = RequestStatus.FAILED;
         state.error = true;
         if (action.payload.status === 200 && action.payload.entityId) {
+          state.error = false;
           const { categories } = state;
           const id = action.payload.entityId;
           const categoriesClone = categories ? [...categories] : [];
           const catIndex = categoriesClone.findIndex(c => c.id === id);
           categoriesClone.splice(catIndex, 1);
           state.categories = categoriesClone;
-          state.error = false;
           state.requestStatus = RequestStatus.SUCCEEDED;
         }
       })
@@ -165,7 +165,6 @@ export const selectCategories = createSelector(getCategoryState, c => {
   const filteredCategories = (c.categories ? [...c.categories] : [])?.sort(
     (a: Category, b: Category) => a.name.localeCompare(b.name)
   );
-  if (filteredCategories.length < 1) return undefined;
   return filteredCategories;
 });
 export const selectError = createSelector(getCategoryState, c => c.error);
