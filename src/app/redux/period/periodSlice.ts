@@ -359,6 +359,7 @@ export const deleteUserPeriodAction = createAsyncThunk<
       );
       const state = getState();
       const { incomes, outcomes } = state.period;
+      const { user } = state.app;
       const periodIncomes = incomes?.filter(i => i.periodId === periodId);
       const periodOutcomes = outcomes?.filter(o => o.periodId === periodId);
       const batch = writeBatch(db);
@@ -369,7 +370,9 @@ export const deleteUserPeriodAction = createAsyncThunk<
           batch.delete(oRef);
         });
       } else {
-        const incomesSnap = await getDocs(incomeCollection);
+        const incomesSnap = await getDocs(
+          query(incomeCollection, where('userId', '==', user?.uid))
+        );
         if (!incomesSnap.empty) {
           incomesSnap.forEach(incomeSnap => {
             const oRef = doc(incomeCollection, incomeSnap.id);
@@ -384,7 +387,9 @@ export const deleteUserPeriodAction = createAsyncThunk<
           batch.delete(oRef);
         });
       } else {
-        const outcomesSnap = await getDocs(outcomeCollection);
+        const outcomesSnap = await getDocs(
+          query(outcomeCollection, where('userId', '==', user?.uid))
+        );
         if (!outcomesSnap.empty) {
           outcomesSnap.forEach(outcomeSnap => {
             const oRef = doc(outcomeCollection, outcomeSnap.id);

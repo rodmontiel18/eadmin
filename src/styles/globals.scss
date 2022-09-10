@@ -171,3 +171,13 @@ h2 {
   padding: 10px;
   max-height: 83vh;
 }
+
+.noData {
+  font-size: 28px;
+  padding-top: 30px;
+  text-align: center;
+  a {
+    color: darkblue;
+    text-decoration: underline;
+  }
+}

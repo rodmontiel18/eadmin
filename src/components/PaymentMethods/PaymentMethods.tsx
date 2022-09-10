@@ -244,7 +244,9 @@ const PaymentMethods: FC = () => {
                 />
               </>
             ) : (
-              <div style={{ textAlign: 'center' }}>
+              <div
+                style={{ fontSize: 16, paddingBottom: 60, textAlign: 'center' }}
+              >
                 No data, try to add an payment method
               </div>
             )}

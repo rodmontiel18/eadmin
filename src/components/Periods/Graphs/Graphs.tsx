@@ -23,6 +23,10 @@ import {
 } from '../../../app/redux/period/periodSlice';
 import { RequestStatus } from '../../../models/api';
 import { selectUser, setLoading } from '../../../app/redux/app/appSlice';
+import {
+  getUserPaymentMethodsAction,
+  selectPaymentMethods,
+} from '../../../app/redux/paymentMethod/paymentMethodSlice';
 
 interface GraphsProps {
   categories: Category[];
@@ -35,17 +39,20 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
   const dispatch = useAppDispatch();
   const incomes = useAppSelector(selectIncomesByPeriodId(periodId));
   const outcomes = useAppSelector(selectOutcomesByPeriodId(periodId));
+  const pMethods = useAppSelector(selectPaymentMethods);
   const requestStatus = useAppSelector(selectRequestStatus);
   const userId = useAppSelector(selectUser)?.uid || '';
 
   useEffect(() => {
     if (
       (!incomes || incomes.length < 1) &&
-      (!outcomes || outcomes.length < 1)
+      (!outcomes || outcomes.length < 1) &&
+      (!pMethods || pMethods.length < 1)
     ) {
       Promise.allSettled([
         dispatch(getUserOutcomesAction({ parentItemId: periodId, userId })),
         dispatch(getUserIncomesAction({ parentItemId: periodId, userId })),
+        dispatch(getUserPaymentMethodsAction({ userId })),
       ]);
     } else {
       if (!incomes || incomes.length < 1) {
@@ -53,6 +60,9 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
       }
       if (!outcomes || outcomes.length < 1) {
         dispatch(getUserOutcomesAction({ parentItemId: periodId, userId }));
+      }
+      if (!pMethods || pMethods.length < 1) {
+        dispatch(getUserPaymentMethodsAction({ userId }));
       }
     }
   }, []);
@@ -71,6 +81,14 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
       dispatch(setLoading(false));
     }
   }, [requestStatus]);
+
+  const getRandomRGB = () => {
+    const randomBetween = () => 0 + Math.floor(Math.random() * (255 - 0 + 1));
+    const r = randomBetween();
+    const g = randomBetween();
+    const b = randomBetween();
+    return `rgb(${r},${g},${b}, 1)`;
+  };
 
   const getGeneralGraphData = (): ChartData<'doughnut'> => {
     const config: ChartData<'doughnut'> = {
@@ -171,7 +189,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
       labels,
       datasets: [
         {
-          label: 'Incomes',
+          label: 'Income',
           data: values,
           backgroundColor: colors.map<string>(c => c.replace(', 1)', ', 0.4)')),
           borderColor: colors,
@@ -180,6 +198,56 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
         },
       ],
     };
+    return config;
+  };
+
+  const getPaymentMethodGraphData = (): ChartData<'doughnut'> => {
+    const colors: string[] = [];
+    const labels: string[] = [];
+    const values: number[] = [];
+    const mapValues = new Map<string, { amount: number; color: string }>();
+    const mapColors = new Map<string, string>();
+    (outcomes || []).forEach(o => {
+      const pMethod = pMethods.find(p => p.id === o.paymentMethodId);
+      if (pMethod) {
+        const { name } = pMethod;
+        let color = getRandomRGB();
+        while (mapColors.has(color)) color = getRandomRGB();
+        mapColors.set(color, color);
+        if (mapValues.has(name)) {
+          const currentValue = mapValues.get(name);
+          if (currentValue) {
+            mapValues.set(name, {
+              ...currentValue,
+              amount: currentValue.amount + o.amount,
+            });
+          }
+        } else {
+          mapValues.set(name, { amount: o.amount, color });
+        }
+      }
+    });
+
+    mapValues.forEach((obj, paymentMethod) => {
+      colors.push(obj.color);
+      labels.push(paymentMethod);
+      values.push(obj.amount);
+    });
+
+    const config: ChartData<'doughnut'> = {
+      labels,
+      datasets: [
+        {
+          backgroundColor: colors.map<string>(c => c.replace(', 1)', ', 0.4)')),
+          borderColor: colors,
+          borderWidth: 1,
+          data: values,
+          hoverOffset: 4,
+          label: 'Payment methods',
+        },
+      ],
+    };
+
     return config;
   };
 
@@ -206,6 +274,13 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
               </div>
               {outcomes && outcomes?.length > 0 && (
                 <>
+                  <Divider />
+                  <div className={styles.paymentMethodsGraph}>
+                    <h3>Payment methods</h3>
+                    <div className={styles.graph}>
+                      <Doughnut data={getPaymentMethodGraphData()} />
+                    </div>
+                  </div>
                   <Divider />
                   <div className={styles.outcomesGraph}>
                     <h3>Outcomes</h3>
