@@ -195,6 +195,7 @@ export const deleteUserOutcomeGroupAction = createAsyncThunk<
       const outcomeCollection = getCollection(outcomeGroupId);
       const state = getState();
       const { outcomes } = state.outcomeGroup;
+      const { user } = state.app;
       const groupOutcomes = outcomes?.filter(o => o.groupId === outcomeGroupId);
       const batch = writeBatch(db);
       if (groupOutcomes && groupOutcomes.length > 0) {
@@ -203,7 +204,9 @@ export const deleteUserOutcomeGroupAction = createAsyncThunk<
           batch.delete(oRef);
         });
       } else {
-        const outcomesSnap = await getDocs(outcomeCollection);
+        const outcomesSnap = await getDocs(
+          query(outcomeCollection, where('userId', '==', user?.uid))
+        );
         if (!outcomesSnap.empty) {
           outcomesSnap.forEach(outcomeSnap => {
             const oRef = doc(outcomeCollection, outcomeSnap.id);

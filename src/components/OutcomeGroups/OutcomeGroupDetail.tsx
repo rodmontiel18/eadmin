@@ -41,6 +41,10 @@ const OutcomeGroupDetail = () => {
   }, []);
 
   useEffect(() => {
+    if (categories && categories.length === 0) handleSetLoading(false);
+  }, [categories]);
+
+  useEffect(() => {
     if (error) {
       showNotificationError();
     }
@@ -53,7 +57,7 @@ const OutcomeGroupDetail = () => {
   const noCategories = (): JSX.Element => {
     return (
       <div className="container">
-        <div style={{ textAlign: 'center' }}>
+        <div className="noData">
           <p>
             Before to begin here, you need to add some{' '}
             <Link to="/categories">Categories</Link> first
@@ -69,20 +73,18 @@ const OutcomeGroupDetail = () => {
       type: 'error',
     });
 
-  return (
-    <div className={styles.outcomeDC}>
-      <h1 style={{ marginBottom: 20 }}>{group?.name}</h1>
-      {categories && categories?.length > 0 && groupId ? (
+  if (categories && categories?.length > 0 && groupId)
+    return (
+      <div className={styles.outcomeDC}>
+        <h1 style={{ marginBottom: 20 }}>{group?.name}</h1>
         <OutcomeList
           categories={categories}
           groupId={groupId}
           setLoading={handleSetLoading}
         />
-      ) : (
-        noCategories()
-      )}
-    </div>
-  );
+      </div>
+    );
+  else return noCategories();
 };
 
 export default OutcomeGroupDetail;

@@ -143,10 +143,16 @@ const PeriodDetail = () => {
   } else {
     return (
       <div className="container">
-        <div style={{ textAlign: 'center' }}>
+        <div className="noData">
           <p>
             Before to begin here, you need to add some{' '}
-            <Link to="/categories">Categories</Link> first
+            <Link
+              to="/categories"
+              style={{ color: 'darkblue', textDecoration: 'underline' }}
+            >
+              Categories
+            </Link>{' '}
+            first
           </p>
         </div>
       </div>
