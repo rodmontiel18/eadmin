@@ -132,10 +132,15 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
       width: 110,
     },
     {
-      key: 'amount',
-      title: 'Amount',
-      dataIndex: 'amount',
       align: 'right',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (amount: number) =>
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(amount),
+      title: 'Amount',
       width: 100,
     },
   ];
@@ -185,10 +190,15 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
               dataSource={getDataSource()}
               footer={currentData => (
                 <>
-                  <span>Total: </span>$
-                  {currentData.reduce(
-                    (acc, current) => acc + current.amount,
-                    0
+                  <span>Total: </span>
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(
+                    currentData.reduce(
+                      (acc, current) => acc + current.amount,
+                      0
+                    )
                   )}
                 </>
               )}

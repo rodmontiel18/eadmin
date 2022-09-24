@@ -267,6 +267,8 @@ const OutcomeList: FC<OutcomeListProps> = ({
       key: 'description',
       title: 'Description',
       dataIndex: 'description',
+      sorter: (a: Outcome, b: Outcome) =>
+        a.description.localeCompare(b.description),
       width: 200,
     },
     {
@@ -278,6 +280,15 @@ const OutcomeList: FC<OutcomeListProps> = ({
       render: (categoryId: string) => {
         const cat = categories.find(c => c.id === categoryId);
         return cat ? cat.name : '';
+      },
+      sorter: (a: Outcome, b: Outcome) => {
+        if (categories?.length > 0) {
+          const catA = categories.find(c => a.categoryId === c.id);
+          const catB = categories.find(c => b.categoryId === c.id);
+          if (catA && catB)
+            return catA?.description.localeCompare(catB?.description);
+        }
+        return 0;
       },
       width: 110,
     },
@@ -291,6 +302,14 @@ const OutcomeList: FC<OutcomeListProps> = ({
         const pm = pMethods?.find(p => p.id === paymentMethodId) || null;
         return pm ? pm.name : '';
       },
+      sorter: (a: Outcome, b: Outcome) => {
+        if (pMethods?.length > 0) {
+          const pmA = pMethods.find(pm => pm.id === a.paymentMethodId);
+          const pmB = pMethods.find(pm => pm.id === b.paymentMethodId);
+          if (pmA && pmB) return pmA.name.localeCompare(pmB.name);
+        }
+        return 0;
+      },
       width: 100,
     },
     {
@@ -298,6 +317,8 @@ const OutcomeList: FC<OutcomeListProps> = ({
       filters: getResponsibleFilters(),
       key: 'responsible',
       onFilter: (val, e) => e.responsible === (val as string),
+      sorter: (a: Outcome, b: Outcome) =>
+        a.responsible.localeCompare(b.responsible),
       title: 'Responsible',
       width: 110,
     },
@@ -308,12 +329,20 @@ const OutcomeList: FC<OutcomeListProps> = ({
       onFilter: (val, e) => e.state === (val as number),
       title: 'State',
       render: (state: OutcomeState) => OutcomeState[state],
+      sorter: (a: Outcome, b: Outcome) =>
+        OutcomeState[a.state || 1].localeCompare(OutcomeState[b.state || 1]),
       width: 80,
     },
     {
       align: 'right',
       dataIndex: 'amount',
       key: 'amount',
+      render: (amunt: number) =>
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(amunt),
+      sorter: (a: Outcome, b: Outcome) => a.amount - b.amount,
       title: 'Amount',
       width: 100,
     },
@@ -378,10 +407,15 @@ const OutcomeList: FC<OutcomeListProps> = ({
                 dataSource={getDataSource()}
                 footer={currentData => (
                   <>
-                    <span>Total: </span>$
-                    {currentData.reduce(
-                      (acc, current) => acc + current.amount,
-                      0
+                    <span>Total: </span>
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(
+                      currentData.reduce(
+                        (acc, current) => acc + current.amount,
+                        0
+                      )
                     )}
                   </>
                 )}
