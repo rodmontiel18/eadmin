@@ -270,7 +270,19 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
             <Card title={null}>
               <div className={styles.generalGraph}>
                 <h3>General balance</h3>
-                <Doughnut data={getGeneralGraphData()} />
+                <div className={styles.graph}>
+                  <Doughnut data={getGeneralGraphData()} />
+                </div>
+                <div className={styles.graphFooter}>
+                  <span>Balance:</span>
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(
+                    (incomes || []).reduce((acc, inc) => acc + inc.amount, 0) -
+                      (outcomes || []).reduce((acc, exp) => acc + exp.amount, 0)
+                  )}
+                </div>
               </div>
               {outcomes && outcomes?.length > 0 && (
                 <>
@@ -279,6 +291,15 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                     <h3>Payment methods</h3>
                     <div className={styles.graph}>
                       <Doughnut data={getPaymentMethodGraphData()} />
+                    </div>
+                    <div className={styles.graphFooter}>
+                      <span>Total: </span>
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(
+                        outcomes.reduce((acc, exp) => acc + exp.amount, 0)
+                      )}
                     </div>
                   </div>
                   <Divider />
@@ -289,7 +310,12 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                     </div>
                     <div className={styles.graphFooter}>
                       <span>Total: </span>
-                      {outcomes.reduce((acc, exp) => acc + exp.amount, 0)}
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(
+                        outcomes.reduce((acc, exp) => acc + exp.amount, 0)
+                      )}
                     </div>
                   </div>
                 </>
@@ -304,7 +330,12 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                     </div>
                     <div className={styles.graphFooter}>
                       <span>Total: </span>
-                      {incomes.reduce((acc, inc) => acc + inc.amount, 0)}
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(
+                        incomes.reduce((acc, inc) => acc + inc.amount, 0)
+                      )}
                     </div>
                   </div>
                 </>
