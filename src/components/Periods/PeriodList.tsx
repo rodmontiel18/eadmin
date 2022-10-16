@@ -1,11 +1,8 @@
 import { MoreOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
 import { Card, Dropdown, List, Menu, Modal, notification } from 'antd';
-import moment from 'moment';
 import { FC, MouseEvent, useEffect, useState } from 'react';
 import { Period } from '../../models/period/Period';
 import PeriodForm from './PeriodForm';
-
-import styles from '../../styles/periods.module.scss';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
@@ -17,15 +14,31 @@ import {
   selectRequestStatus,
   setError,
   setPeriod,
+  setUserPeriodAction,
 } from '../../app/redux/period/periodSlice';
 import { RequestStatus } from '../../models/api';
+import cx from 'classnames';
+
+import styles from '../../styles/periods.module.scss';
 interface PeriodListProps {
   setLoading: (flag: boolean) => void;
   userId: string;
 }
 
+enum AlertPeriodModalMode {
+  Delete = 1,
+  Close,
+}
+interface AlertPeriodModal {
+  mode: AlertPeriodModalMode;
+  show: boolean;
+}
+
 const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
-  const [showAlertPeriodModal, setShowAlertPeriodModal] = useState(false);
+  const [alertPeriodModal, setAlertPeriodModal] = useState<AlertPeriodModal>({
+    mode: AlertPeriodModalMode.Close,
+    show: false,
+  });
   const [showPeriodForm, setShowPeriodForm] = useState(false);
 
   const period = useAppSelector(selectPeriod);
@@ -106,18 +119,27 @@ const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
                 centered
                 onCancel={() => {
                   setPeriod(undefined);
-                  setShowAlertPeriodModal(false);
+                  setAlertPeriodModal({
+                    mode: AlertPeriodModalMode.Delete,
+                    show: false,
+                  });
                 }}
-                onOk={handleDeletePeriod}
+                onOk={handleActionPeriod}
                 okText="Yes"
                 title={
                   <>
                     Waring <WarningOutlined style={{ color: 'yellow' }} />
                   </>
                 }
-                visible={showAlertPeriodModal}
+                visible={alertPeriodModal.show}
               >
-                Are you sure to delete this period?
+                Are you sure to{' '}
+                {alertPeriodModal.mode === AlertPeriodModalMode.Delete
+                  ? 'delete'
+                  : period?.closed
+                  ? 'open'
+                  : 'close'}{' '}
+                this period?
               </Modal>
               <List
                 grid={{
@@ -130,68 +152,88 @@ const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
                   xxl: 4,
                 }}
                 dataSource={periods}
-                renderItem={item => (
-                  <List.Item
-                    onClick={() => {
-                      setLoading(true);
-                    }}
-                  >
-                    <Link to={`/periods/${item.id}`}>
-                      <Card
-                        className={styles.periodCard}
-                        title={
-                          <div className={styles.head}>
-                            <div>{item.name}</div>
-                            <Dropdown
-                              overlay={
-                                <Menu
-                                  items={[
-                                    {
-                                      label: 'Edit',
-                                      key: '0',
-                                      onClick: info => {
-                                        info.domEvent.stopPropagation();
-                                        handleEditPeriod(item);
+                renderItem={item => {
+                  console.table(item);
+                  return (
+                    <List.Item
+                      onClick={() => {
+                        setLoading(true);
+                      }}
+                    >
+                      <Link to={`/periods/${item.id}`}>
+                        <Card
+                          className={cx(styles.periodCard, {
+                            [styles.closedPeriod]: item?.closed,
+                          })}
+                          title={
+                            <div className={styles.head}>
+                              <div>{item.name}</div>
+                              <Dropdown
+                                overlay={
+                                  <Menu
+                                    items={[
+                                      {
+                                        label: 'Edit',
+                                        key: '0',
+                                        onClick: info => {
+                                          info.domEvent.stopPropagation();
+                                          handleEditPeriod(item);
+                                        },
                                       },
-                                    },
-                                    {
-                                      label: 'Delete',
-                                      key: '1',
-                                      onClick: info => {
-                                        info.domEvent.stopPropagation();
-                                        dispatch(setPeriod(item));
-                                        setShowAlertPeriodModal(true);
+                                      {
+                                        label: item.closed ? 'Open' : 'Close',
+                                        key: '1',
+                                        onClick: info => {
+                                          info.domEvent.stopPropagation();
+                                          dispatch(setPeriod(item));
+                                          setAlertPeriodModal({
+                                            mode: AlertPeriodModalMode.Close,
+                                            show: true,
+                                          });
+                                        },
                                       },
-                                    },
-                                  ]}
+                                      {
+                                        label: 'Delete',
+                                        key: '2',
+                                        onClick: info => {
+                                          info.domEvent.stopPropagation();
+                                          dispatch(setPeriod(item));
+                                          setAlertPeriodModal({
+                                            mode: AlertPeriodModalMode.Delete,
+                                            show: true,
+                                          });
+                                        },
+                                      },
+                                    ]}
+                                  />
+                                }
+                                placement="bottomRight"
+                                trigger={['click']}
+                              >
+                                <MoreOutlined
+                                  id="actions-icon"
+                                  className={styles.cardActions}
+                                  onClick={(e: MouseEvent<HTMLElement>) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
                                 />
-                              }
-                              placement="bottomRight"
-                              trigger={['click']}
-                            >
-                              <MoreOutlined
-                                id="actions-icon"
-                                className={styles.cardActions}
-                                onClick={(e: MouseEvent<HTMLElement>) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}
-                              />
-                            </Dropdown>
-                          </div>
-                        }
-                      >
-                        <span>{'From: '}</span>
-                        <br />
-                        {moment.unix(item.from).format('L')}
-                        <br />
-                        <span>{'To: '}</span>
-                        <br />
-                        {moment.unix(item.to).format('L')}
-                      </Card>
-                    </Link>
-                  </List.Item>
-                )}
+                              </Dropdown>
+                            </div>
+                          }
+                        >
+                          <span>{'From: '}</span>
+                          <br />
+                          {item.from.format('L')}
+                          <br />
+                          <span>{'To: '}</span>
+                          <br />
+                          {item.to.format('L')}
+                        </Card>
+                      </Link>
+                    </List.Item>
+                  );
+                }}
               />
             </div>
           ) : (
@@ -204,24 +246,54 @@ const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
     );
   };
 
-  const handleDeletePeriod = () => {
+  const handleActionPeriod = () => {
     setLoading(true);
     if (period?.id) {
-      dispatch(deleteUserPeriodAction(period?.id))
-        .unwrap()
-        .then(resp => {
-          if (resp.status === 200) {
-            notification.open({
-              message: 'Period deleted succesfully',
-              type: 'success',
+      if (alertPeriodModal.mode === AlertPeriodModalMode.Delete) {
+        dispatch(deleteUserPeriodAction(period?.id))
+          .unwrap()
+          .then(resp => {
+            if (resp.status === 200) {
+              notification.open({
+                message: 'Period deleted succesfully',
+                type: 'success',
+              });
+            } else {
+              dispatch(setError(true));
+            }
+          })
+          .finally(() => {
+            setAlertPeriodModal({
+              mode: AlertPeriodModalMode.Delete,
+              show: false,
             });
-          } else {
-            dispatch(setError(true));
-          }
-        })
-        .finally(() => {
-          setShowAlertPeriodModal(false);
-        });
+          });
+      } else {
+        const p: Period = {
+          ...period,
+          closed: !period.closed,
+        };
+        dispatch(setUserPeriodAction(p))
+          .unwrap()
+          .then(resp => {
+            if (resp.status === 200) {
+              notification.open({
+                message: `Period ${
+                  period.closed ? 'opened' : 'closed'
+                } successfully`,
+                type: 'success',
+              });
+            } else {
+              dispatch(setError(true));
+            }
+          })
+          .finally(() => {
+            setAlertPeriodModal({
+              mode: AlertPeriodModalMode.Close,
+              show: false,
+            });
+          });
+      }
     }
   };
 

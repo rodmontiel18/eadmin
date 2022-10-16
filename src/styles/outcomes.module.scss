@@ -15,6 +15,13 @@
           padding: 0 !important;
         }
       }
+      .outcomeTableContainer {
+        position: relative;
+        .outcomesTable {
+          margin-left: 3%;
+          width: 94%;
+        }
+      }
     }
 
     .actionButtons {
@@ -73,6 +80,21 @@
       color: #2591fc;
       font-size: 48px;
       padding: 5px;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .outcomesContainer {
+    .outcomeListInnerContainer {
+      .mainTableCard {
+        .outcomeTableContainer {
+          .outcomesTable {
+            margin-left: 7%;
+            width: 86%;
+          }
+        }
+      }
     }
   }
 }

@@ -2,7 +2,7 @@ import { Button, DatePicker, Form, Input, InputNumber, Select } from 'antd';
 import { DefaultOptionType } from 'antd/lib/cascader';
 import { RangePickerProps } from 'antd/lib/date-picker';
 import { useForm } from 'antd/lib/form/Form';
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 import { FC, useEffect } from 'react';
 import { Category } from '../../models/category';
 import { Outcome, OutcomeState } from '../../models/outcome';
@@ -72,17 +72,17 @@ const OutcomeForm: FC<OutcomeFormProps> = ({
     };
 
     if (outcome && outcome.id) outcomeToSave.id = outcome.id;
-    if (lOutcome?.outcomeDate)
-      outcomeToSave.outcomeDate = lOutcome.outcomeDate.unix();
+    if (lOutcome?.outcomeDate) outcomeToSave.outcomeDate = lOutcome.outcomeDate;
 
     setOutcomeAction(outcomeToSave);
   };
 
-  const disabledDate: RangePickerProps['disabledDate'] = (current): boolean => {
+  const disabledDate: RangePickerProps['disabledDate'] = (
+    current: Moment
+  ): boolean => {
     if (!period) return false;
-    const from = moment.unix(period.from);
-    const to = moment.unix(period.to);
-    return from.subtract(1, 'days') >= current || to < current;
+    const { from, to } = period;
+    return current < from || current > to;
   };
 
   return (
@@ -99,7 +99,7 @@ const OutcomeForm: FC<OutcomeFormProps> = ({
       {!groupId && (
         <Form.Item
           initialValue={
-            outcome?.outcomeDate ? moment.unix(outcome.outcomeDate) : ''
+            outcome?.outcomeDate ? outcome.outcomeDate : period?.from || ''
           }
           label="Date"
           name="outcomeDate"

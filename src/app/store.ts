@@ -8,9 +8,7 @@ import periodReducer from './redux/period/periodSlice';
 export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['app/login/fulfilled'],
-      },
+      serializableCheck: false,
     }),
   reducer: {
     app: appReducer,

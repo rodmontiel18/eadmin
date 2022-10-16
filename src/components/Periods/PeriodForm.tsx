@@ -1,6 +1,6 @@
 import { Button, DatePicker, Form, Input, notification } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 import { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectUser } from '../../app/redux/app/appSlice';
@@ -36,7 +36,7 @@ const PeriodForm: FC<PeriodFormProps> = ({
     if (period) {
       const { from, name, to } = period;
       if (from && name && to) {
-        const tRangeDates = [moment.unix(from), moment.unix(to)];
+        const tRangeDates = [from, to];
         form.setFieldsValue({
           name: name,
           rangeDates: tRangeDates,
@@ -54,13 +54,12 @@ const PeriodForm: FC<PeriodFormProps> = ({
     setLoading(true);
     const { rangeDates, name } = inputs;
     const [from, to] = rangeDates;
-    const fromNumber = from.unix();
-    const toNumber = to.unix();
     const p: Period = {
-      from: fromNumber,
+      closed: false,
+      from: from,
       id: period?.id || '',
       name,
-      to: toNumber,
+      to: to,
       userId: userId || '',
     };
     dispatch(period?.id ? setUserPeriodAction(p) : addUserPeriodAction(p))

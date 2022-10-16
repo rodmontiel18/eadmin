@@ -1,7 +1,16 @@
-export interface Period {
+import { Timestamp } from 'firebase/firestore';
+import { Moment } from 'moment';
+
+export type Period = {
+  closed: boolean;
   id: string;
-  from: number;
+  from: Moment;
   name: string;
-  to: number;
+  to: Moment;
   userId: string;
-}
+};
+
+export type FirebasePeriod = Omit<Period, 'from' | 'to'> & {
+  from: Timestamp;
+  to: Timestamp;
+};
