@@ -22,7 +22,6 @@ import {
   selectPeriodById,
 } from '../../app/redux/period/periodSlice';
 import IncomeList from '../Incomes/IncomeList';
-import moment from 'moment';
 
 enum PeriodTabs {
   Outcomes = 1,
@@ -111,8 +110,7 @@ const PeriodDetail = () => {
         <h1>{period?.name}</h1>
         <div style={{ textAlign: 'center' }}>
           <span>
-            {moment.unix(period?.from || 0).format('L')} -{' '}
-            {moment.unix(period?.to || 0).format('L')}
+            {period?.from.format('L')} - {period?.to.format('L')}
           </span>
         </div>
         <Tabs defaultActiveKey={`${activeTab}`} onChange={handleOnChangeTab}>

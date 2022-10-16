@@ -57,8 +57,7 @@ const IncomeForm: FC<IncomeFormProps> = ({
     };
 
     if (income && income.id) incomeToSave.id = income.id;
-    if (lIncome?.incomeDate)
-      incomeToSave.incomeDate = lIncome.incomeDate.unix();
+    if (lIncome?.incomeDate) incomeToSave.incomeDate = lIncome.incomeDate;
 
     if (incomeToSave.id) {
       dispatch(
@@ -78,9 +77,9 @@ const IncomeForm: FC<IncomeFormProps> = ({
 
   const disabledDate: RangePickerProps['disabledDate'] = (current): boolean => {
     if (!period) return false;
-    const from = moment.unix(period.from);
-    const to = moment.unix(period.to);
-    return from.subtract(1, 'days') >= current || to < current;
+    const from = moment(period.from.toDate());
+    const to = moment(period.to);
+    return current < from || current > to;
   };
 
   return (
@@ -93,7 +92,9 @@ const IncomeForm: FC<IncomeFormProps> = ({
       onFinish={handleOnSubmit}
     >
       <Form.Item
-        initialValue={income?.incomeDate ? moment.unix(income.incomeDate) : ''}
+        initialValue={
+          income?.incomeDate ? income.incomeDate : period?.from || ''
+        }
         label="Date"
         name="incomeDate"
         rules={[{ required: true, message: 'Date is mandadory', type: 'date' }]}

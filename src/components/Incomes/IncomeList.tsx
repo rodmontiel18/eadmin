@@ -112,7 +112,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
       dataIndex: 'incomeDate',
       render: (incomeDate: number) => moment.unix(incomeDate).format('L'),
       sorter: (a: Income, b: Income) =>
-        (a.incomeDate || 0) - (b.incomeDate || 0),
+        (a?.incomeDate?.unix() || 0) - (b.incomeDate?.unix() || 0),
       width: 100,
     },
     {

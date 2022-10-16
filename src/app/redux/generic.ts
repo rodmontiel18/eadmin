@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
+import { FirestoreDataConverter } from 'firebase/firestore';
 import getDbFunctions from '../../api/generic';
 import { BaseResponse } from '../../models/api/base';
 import { GenericItem } from '../../models/util';
@@ -26,10 +27,11 @@ interface FetchActions<T> {
 }
 
 export function getExtraReducers<T extends GenericItem>(
-  collectionName: string
+  collectionName: string,
+  converter?: FirestoreDataConverter<T>
 ): FetchActions<T> {
   const { addItem, deleteUserItem, getUserItemById, getUserItems, setItem } =
-    getDbFunctions<T>(collectionName);
+    getDbFunctions<T>(collectionName, converter);
 
   const addUserItemAction = createAsyncThunk<
     BaseResponse<T>,

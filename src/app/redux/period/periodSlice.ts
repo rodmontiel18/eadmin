@@ -10,24 +10,33 @@ import {
   CollectionReference,
   deleteDoc,
   doc,
+  DocumentData,
   DocumentReference,
+  FirestoreDataConverter,
   getDocs,
   query,
+  QueryDocumentSnapshot,
   setDoc,
+  Timestamp,
   where,
   writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../firebase/firebaseConfig';
 import { RequestStatus } from '../../../models/api';
 import { BaseResponse } from '../../../models/api/base';
-import { Income } from '../../../models/income';
-import { Outcome, OutcomeState } from '../../../models/outcome';
-import { Period } from '../../../models/period/Period';
+import { FirebaseIncome, Income } from '../../../models/income';
+import {
+  FirebaseOutcome,
+  Outcome,
+  OutcomeState,
+} from '../../../models/outcome';
+import { FirebasePeriod, Period } from '../../../models/period/Period';
 import { RequestActions } from '../../../models/util';
 import { genericDataConverter } from '../../../util/firestore';
 import { RootState } from '../../store';
 import { getUserOutcomesAction as getUserOGOutcomesAction } from '../outcomeGroup/outcomeGroupSlice';
 import { AsyncThunkConfig, getExtraReducers, InputParams } from '../generic';
+import moment from 'moment';
 
 interface PeriodState {
   action: RequestActions;
@@ -53,14 +62,15 @@ const INCOME_COLLECTION_NAME = 'income';
 
 const getCollection = <T>(
   parentItemId: string,
-  subCollection: string
+  subCollection: string,
+  converter?: FirestoreDataConverter<T>
 ): CollectionReference<T> => {
   return collection(
     db,
     COLLECTION_NAME,
     parentItemId,
     subCollection
-  ).withConverter(genericDataConverter<T>());
+  ).withConverter(converter || genericDataConverter<T>());
 };
 
 export const addUserIncomeAction = createAsyncThunk<
@@ -78,7 +88,8 @@ export const addUserIncomeAction = createAsyncThunk<
       if (params.entity && params.parentItemId) {
         const incomeCollection = getCollection<Income>(
           params.parentItemId,
-          INCOME_COLLECTION_NAME
+          INCOME_COLLECTION_NAME,
+          incomeConverter
         );
         const snapIncome = (await addDoc(
           incomeCollection,
@@ -115,7 +126,8 @@ export const addUserOutcomeAction = createAsyncThunk<
       if (params.entity && params.parentItemId) {
         const outcomeCollection = getCollection<Outcome>(
           params.parentItemId,
-          OUTCOME_COLLECTION_NAME
+          OUTCOME_COLLECTION_NAME,
+          outcomeConverter
         );
         const snapOutcome = (await addDoc(
           outcomeCollection,
@@ -152,7 +164,8 @@ export const deleteUserIncomeAction = createAsyncThunk<
       if (params.parentItemId) {
         const incomeCollection = getCollection<Income>(
           params.parentItemId,
-          INCOME_COLLECTION_NAME
+          INCOME_COLLECTION_NAME,
+          incomeConverter
         );
         await deleteDoc(doc(incomeCollection, params.entityId));
         resp.status = 200;
@@ -181,7 +194,8 @@ export const deleteUserOutcomeAction = createAsyncThunk<
       if (params.parentItemId) {
         const outcomeCollection = getCollection<Outcome>(
           params.parentItemId,
-          OUTCOME_COLLECTION_NAME
+          OUTCOME_COLLECTION_NAME,
+          outcomeConverter
         );
         await deleteDoc(doc(outcomeCollection, params.entityId));
         resp.status = 200;
@@ -210,7 +224,8 @@ export const getUserIncomesAction = createAsyncThunk<
       if (params.parentItemId) {
         const incomeCollection = getCollection<Income>(
           params.parentItemId,
-          INCOME_COLLECTION_NAME
+          INCOME_COLLECTION_NAME,
+          incomeConverter
         );
         const items: Income[] = [];
         const querySnap = await getDocs(
@@ -248,7 +263,8 @@ export const getUserOutcomesAction = createAsyncThunk<
       if (params.parentItemId) {
         const outcomeCollection = getCollection<Outcome>(
           params.parentItemId,
-          OUTCOME_COLLECTION_NAME
+          OUTCOME_COLLECTION_NAME,
+          outcomeConverter
         );
         const items: Outcome[] = [];
         const querySnap = await getDocs(
@@ -286,7 +302,8 @@ export const setUserIncomeAction = createAsyncThunk<
       if (params.entity && params.parentItemId) {
         const incomeCollection = getCollection<Income>(
           params.parentItemId,
-          INCOME_COLLECTION_NAME
+          INCOME_COLLECTION_NAME,
+          incomeConverter
         );
         await setDoc(
           doc(incomeCollection, params.entityId),
@@ -319,7 +336,8 @@ export const setUserOutcomeAction = createAsyncThunk<
       if (params.entity && params.parentItemId) {
         const outcomeCollection = getCollection<Outcome>(
           params.parentItemId,
-          OUTCOME_COLLECTION_NAME
+          OUTCOME_COLLECTION_NAME,
+          outcomeConverter
         );
         await setDoc(
           doc(outcomeCollection, params.entityId),
@@ -351,11 +369,13 @@ export const deleteUserPeriodAction = createAsyncThunk<
     try {
       const outcomeCollection = getCollection<Outcome>(
         periodId,
-        OUTCOME_COLLECTION_NAME
+        OUTCOME_COLLECTION_NAME,
+        outcomeConverter
       );
       const incomeCollection = getCollection<Income>(
         periodId,
-        INCOME_COLLECTION_NAME
+        INCOME_COLLECTION_NAME,
+        incomeConverter
       );
       const state = getState();
       const { incomes, outcomes } = state.period;
@@ -426,7 +446,8 @@ export const addOutcomesGroupToPeriod = createAsyncThunk<
       if (periodId) {
         const outcomeCollection = getCollection<Outcome>(
           periodId,
-          OUTCOME_COLLECTION_NAME
+          OUTCOME_COLLECTION_NAME,
+          outcomeConverter
         );
         const state = getState();
         const period = state.period.periods?.find(p => p.id === periodId);
@@ -465,7 +486,7 @@ export const addOutcomesGroupToPeriod = createAsyncThunk<
                 responseOutcomes = [];
                 groupOutcomes.forEach(o => {
                   const outcomeRef = doc(outcomeCollection);
-                  const temp = {
+                  const temp: Outcome = {
                     ...o,
                     periodId,
                     outcomeDate: period.to,
@@ -490,12 +511,121 @@ export const addOutcomesGroupToPeriod = createAsyncThunk<
   }
 );
 
+const periodConverter: FirestoreDataConverter<Period> = {
+  toFirestore: (period: Period): DocumentData => {
+    const fPeriod: FirebasePeriod = {
+      ...period,
+      from: Timestamp.fromDate(
+        period.from
+          .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+          .toDate()
+      ),
+      to: Timestamp.fromDate(
+        period.to
+          .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+          .toDate()
+      ),
+    };
+    return fPeriod as DocumentData;
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot<FirebasePeriod>): Period => {
+    const fPeriod: FirebasePeriod = snapshot.data();
+    return {
+      ...fPeriod,
+      from: moment(fPeriod.from.toDate()).set({
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+      }),
+      to: moment(fPeriod.to.toDate()).set({
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+      }),
+    };
+  },
+};
+
+const incomeConverter: FirestoreDataConverter<Income> = {
+  toFirestore: (income: Income): DocumentData => {
+    const fIncome: FirebaseIncome = {
+      ...income,
+      incomeDate: income?.incomeDate
+        ? Timestamp.fromDate(
+            income.incomeDate
+              .set({
+                hour: 0,
+                minute: 0,
+                second: 0,
+                millisecond: 0,
+              })
+              .toDate()
+          )
+        : undefined,
+    };
+    return fIncome as DocumentData;
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot<FirebaseIncome>): Income => {
+    const fIncome: FirebaseIncome = snapshot.data();
+    return {
+      ...fIncome,
+      incomeDate: fIncome?.incomeDate
+        ? moment(fIncome.incomeDate.toDate()).set({
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          })
+        : undefined,
+    };
+  },
+};
+
+const outcomeConverter: FirestoreDataConverter<Outcome> = {
+  toFirestore: (outcome: Outcome): DocumentData => {
+    const fOutcome: FirebaseOutcome = {
+      ...outcome,
+      outcomeDate: outcome?.outcomeDate
+        ? Timestamp.fromDate(
+            outcome.outcomeDate
+              .set({
+                hour: 0,
+                minute: 0,
+                second: 0,
+                millisecond: 0,
+              })
+              .toDate()
+          )
+        : undefined,
+    };
+    return fOutcome as DocumentData;
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot<FirebaseOutcome>
+  ): Outcome => {
+    const fOutcome: FirebaseOutcome = snapshot.data();
+    return {
+      ...fOutcome,
+      outcomeDate: fOutcome?.outcomeDate
+        ? moment(fOutcome.outcomeDate.toDate()).set({
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          })
+        : undefined,
+    };
+  },
+};
+
 export const {
   addUserItemAction: addUserPeriodAction,
   getUserItemByIdAction: getUserPeriodByIdAction,
   getUserItemsAction: getUserPeriodsAction,
   setUserItemAction: setUserPeriodAction,
-} = getExtraReducers<Period>(COLLECTION_NAME);
+} = getExtraReducers<Period>(COLLECTION_NAME, periodConverter);
 
 export const periodSlice = createSlice({
   initialState,
@@ -882,7 +1012,8 @@ export const selectIncomesByPeriodId = (periodId: string) =>
     const filteredIncomes = (p.incomes ? [...p.incomes] : [])
       ?.filter(i => i.periodId === periodId)
       ?.sort(
-        (a: Income, b: Income) => (a.incomeDate || 0) - (b.incomeDate || 0)
+        (a: Income, b: Income) =>
+          (a?.incomeDate?.unix() || 0) - (b?.incomeDate?.unix() || 0)
       );
     if (filteredIncomes.length < 1) return undefined;
     return filteredIncomes;
@@ -893,7 +1024,8 @@ export const selectOutcomesByPeriodId = (periodId: string) =>
     const filteredOutcomes = (p.outcomes ? [...p.outcomes] : [])
       ?.filter(o => o.periodId === periodId)
       ?.sort(
-        (a: Outcome, b: Outcome) => (a.outcomeDate || 0) - (b.outcomeDate || 0)
+        (a: Outcome, b: Outcome) =>
+          (a.outcomeDate?.unix() || 0) - (b.outcomeDate?.unix() || 0)
       );
     if (filteredOutcomes.length < 1) return undefined;
     return filteredOutcomes;
@@ -903,7 +1035,7 @@ export const selectPeriodById = (periodId: string) =>
 export const selectPeriod = createSelector(getPeriodState, p => p.period);
 export const selectPeriods = createSelector(getPeriodState, p => {
   const sortedPeriods = (p.periods ? [...p.periods] : [])?.sort(
-    (a: Period, b: Period) => (a.from || 0) - (b.from || 0)
+    (a: Period, b: Period) => (a?.from?.unix() || 0) - (b?.from?.unix() || 0)
   );
   if (sortedPeriods.length < 1) return undefined;
   return sortedPeriods;

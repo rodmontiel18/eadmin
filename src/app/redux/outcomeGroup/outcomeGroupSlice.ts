@@ -490,7 +490,8 @@ export const selectOutcomesByGroupId = (outcomeGroupId: string) =>
     const filteredOutcomes = (p.outcomes ? [...p.outcomes] : [])
       ?.filter(o => o.groupId === outcomeGroupId)
       ?.sort(
-        (a: Outcome, b: Outcome) => (a.outcomeDate || 0) - (b.outcomeDate || 0)
+        (a: Outcome, b: Outcome) =>
+          (a?.outcomeDate?.unix() || 0) - (b?.outcomeDate?.unix() || 0)
       );
     if (filteredOutcomes.length < 1) return undefined;
     return filteredOutcomes;

@@ -1,8 +1,11 @@
-export interface Outcome {
+import { Timestamp } from 'firebase/firestore';
+import { Moment } from 'moment';
+
+export type Outcome = {
   amount: number;
   categoryId: string;
   description: string;
-  outcomeDate?: number;
+  outcomeDate?: Moment;
   groupId: string;
   id?: string;
   paymentMethodId: string;
@@ -10,7 +13,11 @@ export interface Outcome {
   responsible: string;
   state?: OutcomeState;
   userId: string;
-}
+};
+
+export type FirebaseOutcome = Omit<Outcome, 'outcomeDate'> & {
+  outcomeDate?: Timestamp;
+};
 
 export enum OutcomeTabs {
   Periods = 1,

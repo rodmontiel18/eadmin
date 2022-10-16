@@ -9,6 +9,7 @@ import {
   setDoc,
   where,
   getDoc,
+  FirestoreDataConverter,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { BaseResponse } from '../models/api/base';
@@ -23,16 +24,20 @@ interface GenericFunctions<T> {
   setItem: (item: T) => Promise<BaseResponse<T>>;
 }
 
-const getCollection = <T>(collectionName: string): CollectionReference<T> => {
+const getCollection = <T>(
+  collectionName: string,
+  converter?: FirestoreDataConverter<T>
+): CollectionReference<T> => {
   return collection(db, collectionName).withConverter(
-    genericDataConverter<T>()
+    converter || genericDataConverter<T>()
   );
 };
 
 const getDbFunctions = <T extends GenericItem>(
-  collectionName: string
+  collectionName: string,
+  converter?: FirestoreDataConverter<T>
 ): GenericFunctions<T> => {
-  const collection = getCollection<T>(collectionName);
+  const collection = getCollection<T>(collectionName, converter);
 
   const addItem = async (item: T): Promise<BaseResponse<T>> => {
     const resp: BaseResponse<T> = {

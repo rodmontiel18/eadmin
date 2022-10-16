@@ -1,7 +1,7 @@
 import { DeleteTwoTone, LeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, Modal, Popconfirm } from 'antd';
 import Table, { ColumnsType } from 'antd/lib/table';
-import moment from 'moment';
+import { Moment } from 'moment';
 import { FC, Key, MouseEvent, useEffect, useState } from 'react';
 import { Category } from '../../models/category';
 import { Outcome, OutcomeState } from '../../models/outcome';
@@ -258,9 +258,9 @@ const OutcomeList: FC<OutcomeListProps> = ({
       key: 'date',
       title: 'Date',
       dataIndex: 'outcomeDate',
-      render: (outcomeDate: number) => moment.unix(outcomeDate).format('L'),
+      render: (outcomeDate: Moment) => outcomeDate.format('L'),
       sorter: (a: Outcome, b: Outcome) =>
-        (a?.outcomeDate || 0) - (b?.outcomeDate || 0),
+        (a?.outcomeDate?.unix() || 0) - (b?.outcomeDate?.unix() || 0),
       width: 95,
     },
     {
@@ -400,36 +400,39 @@ const OutcomeList: FC<OutcomeListProps> = ({
             </Modal>
           )}
           <div className={styles.mainTableCard}>
-            <Card title={<h2>Outcomes</h2>}>
-              <Table
-                bordered
-                columns={cols}
-                dataSource={getDataSource()}
-                footer={currentData => (
-                  <>
-                    <span>Total: </span>
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    }).format(
-                      currentData.reduce(
-                        (acc, current) => acc + current.amount,
-                        0
-                      )
-                    )}
-                  </>
-                )}
-                id="outcomesTable"
-                key="outcomesTable"
-                onRow={(item: Outcome) => ({
-                  onClick: () => {
-                    handleEditOutcome(item);
-                  },
-                })}
-                pagination={false}
-                scroll={{ x: 400 }}
-                size="middle"
-              />
+            <Card title={<h2 id="outcomesTitle">Outcomes</h2>}>
+              <div className={styles.outcomeTableContainer}>
+                <Table
+                  bordered
+                  className={styles.outcomesTable}
+                  columns={cols}
+                  dataSource={getDataSource()}
+                  footer={currentData => (
+                    <>
+                      <span>Total: </span>
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      }).format(
+                        currentData.reduce(
+                          (acc, current) => acc + current.amount,
+                          0
+                        )
+                      )}
+                    </>
+                  )}
+                  id="outcomesTable"
+                  key="outcomesTable"
+                  onRow={(item: Outcome) => ({
+                    onClick: () => {
+                      handleEditOutcome(item);
+                    },
+                  })}
+                  pagination={false}
+                  scroll={{ x: 400 }}
+                  size="middle"
+                />
+              </div>
             </Card>
           </div>
         </div>
