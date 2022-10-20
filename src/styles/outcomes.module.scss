@@ -20,6 +20,9 @@
         .outcomesTable {
           margin-left: 3%;
           width: 94%;
+          tr.overLimit {
+            background-color: #e84a4a;
+          }
         }
       }
     }

@@ -27,6 +27,7 @@ interface OutcomeFormType {
 interface OutcomeFormProps {
   categories: Category[];
   outcome?: Outcome;
+  outcomes: Outcome[];
   groupId?: string;
   paymentMethods: PaymentMethod[];
   periodId?: string;
@@ -40,6 +41,7 @@ interface OutcomeFormProps {
 const OutcomeForm: FC<OutcomeFormProps> = ({
   categories,
   outcome,
+  outcomes,
   groupId = '',
   paymentMethods,
   periodId = '',
@@ -59,10 +61,22 @@ const OutcomeForm: FC<OutcomeFormProps> = ({
   }, []);
 
   const handleOnSubmit = (lOutcome: OutcomeFormType) => {
+    const totalOutcomes = outcomes.reduce<number>(
+      (acc: number, out: Outcome) => acc + out.amount,
+      0
+    );
+    let isOverLimit = false;
+    if (
+      period?.outcomeLimit != undefined &&
+      totalOutcomes + lOutcome.amount >= period.outcomeLimit
+    ) {
+      isOverLimit = true;
+    }
     const outcomeToSave: Outcome = {
       amount: lOutcome.amount,
       categoryId: lOutcome.categoryId,
       description: lOutcome.description,
+      isOverLimit,
       groupId: groupId,
       paymentMethodId: lOutcome.paymentMethodId,
       periodId,

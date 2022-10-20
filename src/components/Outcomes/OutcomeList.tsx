@@ -6,8 +6,6 @@ import { FC, Key, MouseEvent, useEffect, useState } from 'react';
 import { Category } from '../../models/category';
 import { Outcome, OutcomeState } from '../../models/outcome';
 import { ColumnFilterItem } from 'antd/lib/table/interface';
-
-import styles from '../../styles/outcomes.module.scss';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
@@ -40,6 +38,9 @@ import {
 import { selectUser } from '../../app/redux/app/appSlice';
 import { RequestStatus } from '../../models/api';
 import OutcomeForm from './OutcomeForm';
+import cx from 'classnames';
+
+import styles from '../../styles/outcomes.module.scss';
 
 interface OutcomeTableType extends Outcome {
   key: Key;
@@ -387,6 +388,7 @@ const OutcomeList: FC<OutcomeListProps> = ({
                 categories={categories}
                 groupId={groupId}
                 outcome={outcome}
+                outcomes={outcomes || []}
                 paymentMethods={pMethods}
                 periodId={periodId}
                 resetOutcome={() => {
@@ -424,6 +426,7 @@ const OutcomeList: FC<OutcomeListProps> = ({
                   id="outcomesTable"
                   key="outcomesTable"
                   onRow={(item: Outcome) => ({
+                    className: cx({ [styles.overLimit]: item.isOverLimit }),
                     onClick: () => {
                       handleEditOutcome(item);
                     },

@@ -1,4 +1,12 @@
-import { Button, DatePicker, Form, Input, notification } from 'antd';
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  notification,
+  Switch,
+} from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { Moment } from 'moment';
 import { FC, useEffect } from 'react';
@@ -19,7 +27,9 @@ interface PeriodFormProps {
 }
 
 interface PeriodFormInputs {
+  closed: boolean;
   name: string;
+  outcomeLimit?: number;
   rangeDates: [Moment, Moment];
 }
 
@@ -28,17 +38,19 @@ const PeriodForm: FC<PeriodFormProps> = ({
   setLoading,
   setShowPeriodForm,
 }) => {
-  const [form] = useForm();
+  const [form] = useForm<PeriodFormInputs>();
   const dispatch = useAppDispatch();
   const userId = useAppSelector(selectUser)?.uid;
 
   useEffect(() => {
     if (period) {
-      const { from, name, to } = period;
+      const { closed, from, name, outcomeLimit, to } = period;
       if (from && name && to) {
         const tRangeDates = [from, to];
         form.setFieldsValue({
+          closed,
           name: name,
+          outcomeLimit,
           rangeDates: tRangeDates,
         });
       }
@@ -52,14 +64,15 @@ const PeriodForm: FC<PeriodFormProps> = ({
 
   const handleOnSubmit = (inputs: PeriodFormInputs) => {
     setLoading(true);
-    const { rangeDates, name } = inputs;
+    const { closed, name, outcomeLimit, rangeDates } = inputs;
     const [from, to] = rangeDates;
     const p: Period = {
-      closed: false,
-      from: from,
+      closed,
+      from,
       id: period?.id || '',
       name,
-      to: to,
+      outcomeLimit,
+      to,
       userId: userId || '',
     };
     dispatch(period?.id ? setUserPeriodAction(p) : addUserPeriodAction(p))
@@ -102,6 +115,12 @@ const PeriodForm: FC<PeriodFormProps> = ({
         rules={[{ required: true, message: 'Range date is mandatory' }]}
       >
         <DatePicker.RangePicker inputReadOnly size="small" />
+      </Form.Item>
+      <Form.Item label="Outcome limit" name="outcomeLimit">
+        <InputNumber />
+      </Form.Item>
+      <Form.Item label="Period closed" name="closed" valuePropName="checked">
+        <Switch />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Button
