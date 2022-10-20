@@ -68,6 +68,7 @@ const OutcomeForm: FC<OutcomeFormProps> = ({
     let isOverLimit = false;
     if (
       period?.outcomeLimit != undefined &&
+      period.outcomeLimit > 0 &&
       totalOutcomes + lOutcome.amount >= period.outcomeLimit
     ) {
       isOverLimit = true;
