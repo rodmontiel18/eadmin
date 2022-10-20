@@ -64,7 +64,7 @@ const PeriodForm: FC<PeriodFormProps> = ({
 
   const handleOnSubmit = (inputs: PeriodFormInputs) => {
     setLoading(true);
-    const { closed, name, outcomeLimit, rangeDates } = inputs;
+    const { closed = false, name, outcomeLimit = -1, rangeDates } = inputs;
     const [from, to] = rangeDates;
     const p: Period = {
       closed,
