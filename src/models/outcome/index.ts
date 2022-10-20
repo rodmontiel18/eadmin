@@ -8,6 +8,7 @@ export type Outcome = {
   outcomeDate?: Moment;
   groupId: string;
   id?: string;
+  isOverLimit: boolean;
   paymentMethodId: string;
   periodId: string;
   responsible: string;

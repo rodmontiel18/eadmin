@@ -6,6 +6,7 @@ export type Period = {
   id: string;
   from: Moment;
   name: string;
+  outcomeLimit?: number;
   to: Moment;
   userId: string;
 };

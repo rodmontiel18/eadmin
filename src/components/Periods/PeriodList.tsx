@@ -153,7 +153,6 @@ const PeriodList: FC<PeriodListProps> = ({ setLoading, userId }) => {
                 }}
                 dataSource={periods}
                 renderItem={item => {
-                  console.table(item);
                   return (
                     <List.Item
                       onClick={() => {
