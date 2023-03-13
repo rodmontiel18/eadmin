@@ -1,7 +1,7 @@
 import { DeleteTwoTone, LeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, Modal, Popconfirm, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import moment from 'moment';
+import { Moment } from 'moment';
 import { FC, Key, MouseEvent, useEffect, useState } from 'react';
 import { Category } from '../../models/category';
 import { Income } from '../../models/income';
@@ -110,7 +110,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
       key: 'date',
       title: 'Date',
       dataIndex: 'incomeDate',
-      render: (incomeDate: number) => moment.unix(incomeDate).format('L'),
+      render: (incomeDate: Moment) => incomeDate.format('L'),
       sorter: (a: Income, b: Income) =>
         (a?.incomeDate?.unix() || 0) - (b.incomeDate?.unix() || 0),
       width: 100,

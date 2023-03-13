@@ -6,7 +6,9 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   logout,
   selectLoading,
+  selectMenuCollapsed,
   selectUser,
+  setMenuCollapsed,
   setUser,
 } from '../../app/redux/app/appSlice';
 import { AuxProps } from '../../common/commonTypes';
@@ -14,18 +16,19 @@ import HeaderMenu from '../HeaderMenu/HeaderMenu';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import styles from '../../styles/layout.module.scss';
+import { getDeviceType } from '../../util/util';
 
 const Layout: React.FC<AuxProps> = () => {
-  const [collapsed, setCollapsed] = useState(true);
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectLoading);
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const cookieToken = Cookies.get('token');
+  const collapsed = useAppSelector(selectMenuCollapsed);
 
   const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
+    dispatch(setMenuCollapsed(!collapsed));
   };
 
   useEffect(() => {
@@ -83,7 +86,7 @@ const Layout: React.FC<AuxProps> = () => {
         ) : (
           <>
             {user && user.uid && (
-              <AntLayout className="content-layout" hasSider>
+              <AntLayout className={styles.contentLayout} hasSider>
                 {user && user.uid && (
                   <>
                     <AntLayout>
@@ -103,7 +106,7 @@ const Layout: React.FC<AuxProps> = () => {
                         theme="light"
                         collapsible
                         collapsed={collapsed}
-                        collapsedWidth={0}
+                        collapsedWidth={getDeviceType() === 'desktop' ? 55 : 0}
                         trigger={null}
                       >
                         <HeaderMenu
