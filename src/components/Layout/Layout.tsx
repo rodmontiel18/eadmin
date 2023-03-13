@@ -1,6 +1,6 @@
 import { Layout as AntLayout, Spin } from 'antd';
 import Cookies from 'js-cookie';
-import React, { MouseEvent, useEffect, useState } from 'react';
+import React, { MouseEvent, useEffect } from 'react';
 import { auth } from '../../firebase/firebaseConfig';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
