@@ -15,6 +15,7 @@ export interface UserType {
 }
 
 export interface AppState {
+  menuCollapsed: boolean;
   error: string;
   loading: boolean;
   user: UserType | undefined;
@@ -26,6 +27,7 @@ interface LoginParams {
 }
 
 const initialState: AppState = {
+  menuCollapsed: true,
   error: '',
   loading: true,
   user: undefined,
@@ -56,6 +58,9 @@ export const appSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<UserType>) => {
       state.user = action.payload;
+    },
+    setMenuCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.menuCollapsed = action.payload;
     },
   },
   extraReducers: builder => {
@@ -96,10 +101,12 @@ export const appSlice = createSlice({
   },
 });
 
-export const { setLoading, setUser } = appSlice.actions;
+export const { setLoading, setMenuCollapsed, setUser } = appSlice.actions;
 
 export const selectError = (state: RootState) => state.app.error;
 export const selectLoading = (state: RootState) => state.app.loading;
+export const selectMenuCollapsed = (state: RootState) =>
+  state.app.menuCollapsed;
 export const selectUser = (state: RootState) => state.app.user;
 
 export default appSlice.reducer;

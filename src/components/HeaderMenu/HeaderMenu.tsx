@@ -13,6 +13,7 @@ import {
 import styles from '../../styles/menu.module.scss';
 import { useAppDispatch } from '../../app/hooks';
 import { logout } from '../../app/redux/app/appSlice';
+import { getDeviceType } from '../../util/util';
 
 interface HeaderMenuProps {
   collapsed: boolean;
@@ -37,6 +38,13 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ collapsed, toggleCollapsed }) => {
       document.addEventListener('click', toggleCollapsed, false);
     }
   }, [collapsed]);
+
+  const handleClickMenu = () => {
+    const deviceType = getDeviceType();
+    if (deviceType !== 'desktop' && !collapsed) {
+      toggleCollapsed();
+    }
+  };
 
   const items: ItemType[] = [
     {
@@ -96,9 +104,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ collapsed, toggleCollapsed }) => {
         selectedKeys={[currentKey]}
         items={items}
         mode="inline"
-        onClick={() => {
-          toggleCollapsed();
-        }}
+        onClick={handleClickMenu}
       />
     </>
   );

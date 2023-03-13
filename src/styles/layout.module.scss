@@ -4,3 +4,9 @@
     max-height: 100% !important;
   }
 }
+
+.contentLayout {
+  [class*='ant-layout-sider'] {
+    overflow: hidden;
+  }
+}
