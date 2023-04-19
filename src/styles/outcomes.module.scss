@@ -54,39 +54,6 @@
   }
 }
 
-.actionsContainer {
-  bottom: 22px;
-  display: grid;
-  grid-template-columns: 50% 50%;
-  margin-left: -10px;
-  max-width: 1200px;
-  position: fixed;
-  width: 100%;
-
-  .addIcon {
-    margin-right: 22px;
-    text-align: end;
-    span {
-      background-color: #d3d3d3;
-      border-radius: 50%;
-      color: #2591fc;
-      font-size: 48px;
-      padding: 5px;
-    }
-  }
-  .backIcon {
-    margin-left: 22px;
-    text-align: start;
-    span {
-      background-color: #d3d3d3;
-      border-radius: 50%;
-      color: #2591fc;
-      font-size: 48px;
-      padding: 5px;
-    }
-  }
-}
-
 @media (max-width: 720px) {
   .outcomesContainer {
     .outcomeListInnerContainer {

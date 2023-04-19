@@ -18,7 +18,7 @@ import {
   setOutcome as setOGOutcome,
   selectRequestStatus as selectOGRequestStatus,
   setUserOutcomeAction as setUserOGOutcomeAction,
-} from '../../app/redux/outcomeGroup/outcomeGroupSlice';
+} from '../../app/redux/outcomeGroup';
 import {
   addUserOutcomeAction as addUserPOutcomeAction,
   deleteUserOutcomeAction as deletePUserOutcomeAction,
@@ -29,13 +29,13 @@ import {
   setOutcome as setPOutcome,
   selectRequestStatus as selectPRequestStatus,
   setUserOutcomeAction as setUserPOutcomeAction,
-} from '../../app/redux/period/periodSlice';
+} from '../../app/redux/period';
 import { InputParams } from '../../app/redux/generic';
 import {
   getUserPaymentMethodsAction,
   selectPaymentMethods,
-} from '../../app/redux/paymentMethod/paymentMethodSlice';
-import { selectUser } from '../../app/redux/app/appSlice';
+} from '../../app/redux/paymentMethod';
+import { selectUser } from '../../app/redux/app';
 import { RequestStatus } from '../../models/api';
 import OutcomeForm from './OutcomeForm';
 import cx from 'classnames';
@@ -102,7 +102,7 @@ const OutcomeList: FC<OutcomeListProps> = ({
       handleSetOutcome();
       setShowOutcomeFormModal(false);
     };
-  }, []);
+  }, [periodId]);
 
   useEffect(() => {
     if (
@@ -357,7 +357,7 @@ const OutcomeList: FC<OutcomeListProps> = ({
     if (outcomes) {
       return outcomes.map<OutcomeTableType>(o => ({
         ...o,
-        key: o?.id || '',
+        key: crypto.randomUUID(),
       }));
     }
     return [];
@@ -440,13 +440,13 @@ const OutcomeList: FC<OutcomeListProps> = ({
           </div>
         </div>
       </div>
-      <div className={styles.actionsContainer}>
-        <div className={styles.backIcon}>
+      <div className="actionsContainer">
+        <div className="backIcon">
           <Link to={`/periods?tab=${groupId ? 2 : 1}`}>
             <LeftOutlined />
           </Link>
         </div>
-        <div className={styles.addIcon}>
+        <div className="addIcon">
           <PlusOutlined
             onClick={() => {
               setShowOutcomeFormModal(true);

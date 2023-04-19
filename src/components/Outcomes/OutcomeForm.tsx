@@ -10,7 +10,7 @@ import { PaymentMethod } from '../../models/paymentMethods';
 
 import globals from '../../styles/globals.module.scss';
 import { useAppSelector } from '../../app/hooks';
-import { selectPeriodById } from '../../app/redux/period/periodSlice';
+import { selectPeriodById } from '../../app/redux/period';
 
 const { Option } = Select;
 

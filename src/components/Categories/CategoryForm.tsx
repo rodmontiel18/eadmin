@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../app/hooks';
 import {
   addUserCategoryAction,
   setUserCategoryAction,
-} from '../../app/redux/category/categorySlice';
+} from '../../app/redux/category';
 
 const { Option } = Select;
 

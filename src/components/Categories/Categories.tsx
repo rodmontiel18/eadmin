@@ -7,7 +7,7 @@ import { Category, CategoryType } from '../../models/category';
 import CategoryForm from './CategoryForm';
 import { ColumnFilterItem } from 'antd/lib/table/interface';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser, setLoading } from '../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../app/redux/app';
 import {
   deleteUserCategoryAction,
   finishRequest,
@@ -18,7 +18,7 @@ import {
   selectRequestStatus,
   setError,
   setFormCategoryAction,
-} from '../../app/redux/category/categorySlice';
+} from '../../app/redux/category';
 
 import styles from '../../styles/categories.module.scss';
 import { RequestStatus } from '../../models/api';
@@ -222,8 +222,8 @@ const Categories: FC = () => {
           </Card>
         </div>
       </div>
-      <div className={styles.actionsContainer}>
-        <div className={styles.addIcon}>
+      <div className="actionsContainer">
+        <div className="addIcon">
           <PlusOutlined
             onClick={() => {
               setShowCategoryFormModal(true);

@@ -13,7 +13,7 @@ import { PaymentMethod } from '../../models/paymentMethods';
 import cx from 'classnames';
 import styles from '../../styles/paymentM.module.scss';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser, setLoading } from '../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../app/redux/app';
 import {
   addUserPaymentMethodAction,
   deleteUserPaymentMethodAction,
@@ -26,7 +26,7 @@ import {
   setError,
   setPaymentMethod,
   setUserPaymentMethodAction,
-} from '../../app/redux/paymentMethod/paymentMethodSlice';
+} from '../../app/redux/paymentMethod';
 import { batch } from 'react-redux';
 import { RequestStatus } from '../../models/api';
 
@@ -253,8 +253,8 @@ const PaymentMethods: FC = () => {
           </Card>
         </div>
       </div>
-      <div className={styles.actionsContainer}>
-        <div className={styles.addIcon}>
+      <div className="actionsContainer">
+        <div className="addIcon">
           <PlusOutlined
             onClick={() => {
               setShowForm(true);

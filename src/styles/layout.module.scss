@@ -10,3 +10,21 @@
     overflow: hidden;
   }
 }
+
+.rootContentContainer {
+  height: 100%;
+  width: calc(100% - 55px);
+  .wrapperContainer {
+    margin: 0 auto;
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .rootContentContainer {
+    width: 100%;
+    .wrapperContainer {
+      width: calc(100% - 20px);
+    }
+  }
+}

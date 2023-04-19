@@ -1,8 +1,12 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../../models/api';
 import { Category } from '../../../models/category';
-import { RootState } from '../../store';
-import { getExtraReducers } from '../generic';
+import {
+  addUserCategoryAction,
+  deleteUserCategoryAction,
+  getUserCategoriesAction,
+  setUserCategoryAction,
+} from './categoryActions';
 
 interface CategoryState {
   action:
@@ -24,13 +28,6 @@ const initialState: CategoryState = {
   formCategory: undefined,
   requestStatus: RequestStatus.IDLE,
 };
-
-export const {
-  addUserItemAction: addUserCategoryAction,
-  deleteUserItemAction: deleteUserCategoryAction,
-  getUserItemsAction: getUserCategoriesAction,
-  setUserItemAction: setUserCategoryAction,
-} = getExtraReducers<Category>('category');
 
 export const categorySlice = createSlice({
   name: 'category',
@@ -157,24 +154,5 @@ export const categorySlice = createSlice({
 
 export const { finishRequest, setError, setFormCategoryAction } =
   categorySlice.actions;
-
-const getCategoryState = (state: RootState) => state.category;
-
-export const selectAction = createSelector(getCategoryState, c => c.action);
-export const selectCategories = createSelector(getCategoryState, c => {
-  const filteredCategories = (c.categories ? [...c.categories] : [])?.sort(
-    (a: Category, b: Category) => a.name.localeCompare(b.name)
-  );
-  return filteredCategories;
-});
-export const selectError = createSelector(getCategoryState, c => c.error);
-export const selectFormCategory = createSelector(
-  getCategoryState,
-  c => c.formCategory
-);
-export const selectRequestStatus = createSelector(
-  getCategoryState,
-  c => c.requestStatus
-);
 
 export default categorySlice.reducer;

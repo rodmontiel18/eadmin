@@ -1,18 +1,20 @@
 import { notification, Tabs } from 'antd';
-import { useEffect, useState } from 'react';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
 import { Category, CategoryType } from '../../models/category';
 import OutcomeList from '../Outcomes/OutcomeList';
 import Graphs from './Graphs/Graphs';
-import styles from '../../styles/periods.module.scss';
+import styles from '../../styles/periodDetail.module.scss';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser, setLoading } from '../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../app/redux/app';
 import {
   getUserCategoriesAction,
   selectCategories,
-} from '../../app/redux/category/categorySlice';
+} from '../../app/redux/category';
 import {
   Link,
   ParamKeyValuePair,
+  useNavigate,
   useParams,
   useSearchParams,
 } from 'react-router-dom';
@@ -20,7 +22,8 @@ import {
   getUserPeriodsAction,
   selectError,
   selectPeriodById,
-} from '../../app/redux/period/periodSlice';
+  selectPeriods,
+} from '../../app/redux/period';
 import IncomeList from '../Incomes/IncomeList';
 
 enum PeriodTabs {
@@ -32,39 +35,47 @@ enum PeriodTabs {
 const PeriodDetail = () => {
   const [activeTab, setActiveTab] = useState<PeriodTabs>(PeriodTabs.Outcomes);
   const params = useParams();
+  const navigation = useNavigate();
 
   const periodId = params?.periodId || '';
   const period = useAppSelector(selectPeriodById(periodId));
+  const periods = useAppSelector(selectPeriods);
 
   const categories = useAppSelector(selectCategories);
   const dispatch = useAppDispatch();
   const error = useAppSelector(selectError);
   const [searchParams, setSearchParams] = useSearchParams();
   const userId = useAppSelector(selectUser)?.uid || '';
+  const currentPeriodIndex = useMemo(() => {
+    if (periods) {
+      return periods.findIndex(p => p.id === periodId);
+    }
+    return -1;
+  }, [periodId, JSON.stringify(periods)]);
 
   useEffect(() => {
-    if (periodId) {
-      const queryStrTab = searchParams.get('tab');
-      const tabParam: ParamKeyValuePair = [
-        'tab',
-        `${queryStrTab || PeriodTabs.Outcomes}`,
-      ];
-      setActiveTab(
-        (queryStrTab && parseInt(queryStrTab, 10)) || PeriodTabs.Outcomes
+    const queryStrTab = searchParams.get('tab');
+    const tabParam: ParamKeyValuePair = [
+      'tab',
+      `${queryStrTab || PeriodTabs.Outcomes}`,
+    ];
+    setActiveTab(
+      (queryStrTab && parseInt(queryStrTab, 10)) || PeriodTabs.Outcomes
+    );
+    setSearchParams([tabParam]);
+    if (categories.length < 1) {
+      dispatch(
+        getUserCategoriesAction({
+          userId,
+        })
       );
-      setSearchParams([tabParam]);
-
-      if (categories.length < 1) {
-        dispatch(
-          getUserCategoriesAction({
-            userId,
-          })
-        );
-      }
-
-      if (period === undefined) {
-        dispatch(getUserPeriodsAction({ userId }));
-      }
+    }
+    if (!periods || periods.length === 0) {
+      dispatch(
+        getUserPeriodsAction({
+          userId,
+        })
+      );
     }
   }, []);
 
@@ -101,14 +112,54 @@ const PeriodDetail = () => {
       type: 'error',
     });
 
+  const stickyButtonAction = (action: string) => {
+    if (periods && periods?.length > 0) {
+      if (action == 'prev') {
+        if (currentPeriodIndex > 0) {
+          navigation(`/periods/${periods[currentPeriodIndex - 1].id}`, {
+            replace: true,
+          });
+        }
+      } else {
+        if (currentPeriodIndex < periods.length - 1) {
+          navigation(`/periods/${periods[currentPeriodIndex + 1].id}`, {
+            replace: true,
+          });
+        }
+      }
+    }
+  };
+
   const outcomeCategories = getTabCategories(CategoryType.Outcomes);
   const incomeCategories = getTabCategories(CategoryType.Income);
 
   if (categories && categories?.length > 0) {
     return (
       <div className={styles.periodDContainer}>
+        <div className={styles.periodStickyBar}>
+          {periods && currentPeriodIndex !== 0 ? (
+            <div
+              className={styles.prev}
+              title="Previous period"
+              onClick={() => stickyButtonAction('prev')}
+            >
+              <LeftOutlined />
+            </div>
+          ) : (
+            <div />
+          )}
+          {periods && currentPeriodIndex !== periods.length - 1 && (
+            <div
+              className={styles.next}
+              title="Next period"
+              onClick={() => stickyButtonAction('next')}
+            >
+              <RightOutlined />
+            </div>
+          )}
+        </div>
         <h1>{period?.name}</h1>
-        <div style={{ textAlign: 'center' }}>
+        <div className={styles.periodDates}>
           <span>
             {period?.from.format('L')} - {period?.to.format('L')}
           </span>

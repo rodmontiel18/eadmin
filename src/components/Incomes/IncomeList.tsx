@@ -17,7 +17,7 @@ import {
   selectIncomesByPeriodId,
   selectRequestStatus,
   setIncome,
-} from '../../app/redux/period/periodSlice';
+} from '../../app/redux/period';
 import IncomeForm from './IncomeForm';
 import { RequestStatus } from '../../models/api';
 import { setLoading } from '../../app/redux/app/appSlice';
@@ -53,7 +53,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
       dispatch(setIncome());
       setShowIncomeFormModal(false);
     };
-  }, []);
+  }, [periodId]);
 
   useEffect(() => {
     if (
@@ -149,7 +149,7 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
     if (incomes) {
       return incomes.map<IncomeTableType>(income => ({
         ...income,
-        key: income?.id || '',
+        key: crypto.randomUUID(),
       }));
     }
     return [];
@@ -216,13 +216,13 @@ const IncomeList: FC<IncomeListProps> = ({ categories, periodId, userId }) => {
           </Card>
         </div>
       </div>
-      <div className={styles.actionsContainer}>
-        <div className={styles.backIcon}>
+      <div className="actionsContainer">
+        <div className="backIcon">
           <Link to="/periods">
             <LeftOutlined />
           </Link>
         </div>
-        <div className={styles.addIcon}>
+        <div className="addIcon">
           <PlusOutlined
             onClick={() => {
               setShowIncomeFormModal(true);

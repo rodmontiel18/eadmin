@@ -1,12 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  UserCredential,
-} from 'firebase/auth';
-import { auth } from '../../../firebase/firebaseConfig';
-import { RootState } from '../../store';
-import { AsyncThunkConfig } from '../generic';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { login, logout } from './appActions';
 
 export interface UserType {
   email: string | null;
@@ -21,11 +15,6 @@ export interface AppState {
   user: UserType | undefined;
 }
 
-interface LoginParams {
-  email: string;
-  password: string;
-}
-
 const initialState: AppState = {
   menuCollapsed: true,
   error: '',
@@ -33,23 +22,7 @@ const initialState: AppState = {
   user: undefined,
 };
 
-export const login = createAsyncThunk<
-  UserCredential,
-  LoginParams,
-  AsyncThunkConfig
->('app/login', async (loginParams: LoginParams) => {
-  const { email, password } = loginParams;
-  return await signInWithEmailAndPassword(auth, email, password);
-});
-
-export const logout = createAsyncThunk<void, undefined, AsyncThunkConfig>(
-  'app/logout',
-  async () => {
-    return await signOut(auth);
-  }
-);
-
-export const appSlice = createSlice({
+const appSlice = createSlice({
   name: 'root',
   initialState,
   reducers: {
@@ -102,11 +75,4 @@ export const appSlice = createSlice({
 });
 
 export const { setLoading, setMenuCollapsed, setUser } = appSlice.actions;
-
-export const selectError = (state: RootState) => state.app.error;
-export const selectLoading = (state: RootState) => state.app.loading;
-export const selectMenuCollapsed = (state: RootState) =>
-  state.app.menuCollapsed;
-export const selectUser = (state: RootState) => state.app.user;
-
 export default appSlice.reducer;

@@ -1,4 +1,4 @@
-import { Button, Form, Input, notification } from 'antd';
+import { Button, Form, Input, Modal, notification } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { FC, useEffect } from 'react';
 import { useAppDispatch } from '../../app/hooks';
@@ -7,7 +7,7 @@ import {
   setError,
   setOutcomeGroup,
   setUserOutcomeGroupAction,
-} from '../../app/redux/outcomeGroup/outcomeGroupSlice';
+} from '../../app/redux/outcomeGroup';
 import { OutcomeGroup } from '../../models/outcomeGroup/OutcomeGroup';
 
 interface OutcomeGroupFormProps {
@@ -29,7 +29,6 @@ const OutcomeGroupForm: FC<OutcomeGroupFormProps> = ({
   userId,
 }) => {
   const [form] = useForm();
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -81,43 +80,55 @@ const OutcomeGroupForm: FC<OutcomeGroupFormProps> = ({
   };
 
   return (
-    <Form
-      autoComplete="off"
-      form={form}
-      labelCol={{ span: 6 }}
-      name="outcomeGroup"
-      onFinish={handleOnSubmit}
-      wrapperCol={{ span: 18 }}
+    <Modal
+      centered
+      closable
+      destroyOnClose
+      footer={null}
+      onCancel={() => {
+        setShowOutcomeGroupForm(false);
+      }}
+      title={`${group ? 'Edit' : 'Add new'} outcome group`}
+      visible
     >
-      <Form.Item
-        label="Name"
-        name="name"
-        rules={[{ required: true, message: 'Name is mandatory' }]}
+      <Form
+        autoComplete="off"
+        form={form}
+        labelCol={{ span: 6 }}
+        name="outcomeGroup"
+        onFinish={handleOnSubmit}
+        wrapperCol={{ span: 18 }}
       >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        label="Description"
-        name="description"
-        rules={[{ required: true, message: 'Description is mandatory' }]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button
-          htmlType="button"
-          onClick={() => {
-            setShowOutcomeGroupForm(false);
-          }}
-          style={{ marginRight: 10 }}
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: 'Name is mandatory' }]}
         >
-          Cancel
-        </Button>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: 'Description is mandatory' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button
+            htmlType="button"
+            onClick={() => {
+              setShowOutcomeGroupForm(false);
+            }}
+            style={{ marginRight: 10 }}
+          >
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
 

@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import styles from '../../../styles/graph.module.scss';
 import {
   ArcElement,
@@ -20,13 +20,13 @@ import {
   selectIncomesByPeriodId,
   selectOutcomesByPeriodId,
   selectRequestStatus,
-} from '../../../app/redux/period/periodSlice';
+} from '../../../app/redux/period';
 import { RequestStatus } from '../../../models/api';
-import { selectUser, setLoading } from '../../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../../app/redux/app';
 import {
   getUserPaymentMethodsAction,
   selectPaymentMethods,
-} from '../../../app/redux/paymentMethod/paymentMethodSlice';
+} from '../../../app/redux/paymentMethod';
 
 interface GraphsProps {
   categories: Category[];
@@ -65,7 +65,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
         dispatch(getUserPaymentMethodsAction({ userId }));
       }
     }
-  }, []);
+  }, [periodId]);
 
   useEffect(() => {
     if (
@@ -90,7 +90,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
     return `rgb(${r},${g},${b}, 1)`;
   };
 
-  const getGeneralGraphData = (): ChartData<'doughnut'> => {
+  const generalGraphData = useMemo<ChartData<'doughnut'>>(() => {
     const config: ChartData<'doughnut'> = {
       labels: ['Incomes', 'Outcomes'],
       datasets: [
@@ -109,9 +109,9 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
     };
 
     return config;
-  };
+  }, [JSON.stringify(incomes), JSON.stringify(outcomes)]);
 
-  const getOutcomesGraphData = (): ChartData<'doughnut'> => {
+  const outcomesGraphData = useMemo<ChartData<'doughnut'>>(() => {
     const colors: string[] = [];
     const labels: string[] = [];
     const values: number[] = [];
@@ -154,9 +154,9 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
       ],
     };
     return config;
-  };
+  }, [JSON.stringify(outcomes), JSON.stringify(categories)]);
 
-  const getIncomesGraphData = (): ChartData<'doughnut'> => {
+  const incomesGraphData = useMemo<ChartData<'doughnut'>>(() => {
     const colors: string[] = [];
     const labels: string[] = [];
     const values: number[] = [];
@@ -199,9 +199,9 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
       ],
     };
     return config;
-  };
+  }, [JSON.stringify(incomes), JSON.stringify(categories)]);
 
-  const getPaymentMethodGraphData = (): ChartData<'doughnut'> => {
+  const paymentMethodGraphData = useMemo<ChartData<'doughnut'>>(() => {
     const colors: string[] = [];
     const labels: string[] = [];
     const values: number[] = [];
@@ -249,7 +249,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
     };
 
     return config;
-  };
+  }, [JSON.stringify(outcomes), JSON.stringify(pMethods)]);
 
   if ((!incomes || incomes.length < 1) && (!outcomes || outcomes.length < 1)) {
     return (
@@ -271,7 +271,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
               <div className={styles.generalGraph}>
                 <h3>General balance</h3>
                 <div className={styles.graph}>
-                  <Doughnut data={getGeneralGraphData()} />
+                  <Doughnut data={generalGraphData} />
                 </div>
                 <div className={styles.graphFooter}>
                   <span>Balance:</span>
@@ -290,7 +290,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                   <div className={styles.paymentMethodsGraph}>
                     <h3>Payment methods</h3>
                     <div className={styles.graph}>
-                      <Doughnut data={getPaymentMethodGraphData()} />
+                      <Doughnut data={paymentMethodGraphData} />
                     </div>
                     <div className={styles.graphFooter}>
                       <span>Total: </span>
@@ -306,7 +306,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                   <div className={styles.outcomesGraph}>
                     <h3>Outcomes</h3>
                     <div className={styles.graph}>
-                      <Doughnut data={getOutcomesGraphData()} />
+                      <Doughnut data={outcomesGraphData} />
                     </div>
                     <div className={styles.graphFooter}>
                       <span>Total: </span>
@@ -326,7 +326,7 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
                   <div className={styles.incomesGraph}>
                     <h3>Incomes</h3>
                     <div className={styles.graph}>
-                      <Doughnut data={getIncomesGraphData()} />
+                      <Doughnut data={incomesGraphData} />
                     </div>
                     <div className={styles.graphFooter}>
                       <span>Total: </span>
@@ -343,8 +343,8 @@ const Graphs: FC<GraphsProps> = ({ categories, periodId }) => {
             </Card>
           </div>
         </div>
-        <div className={styles.actionsContainer}>
-          <div className={styles.backIcon}>
+        <div className="actionsContainer">
+          <div className="backIcon">
             <Link to="/periods">
               <LeftOutlined />
             </Link>
