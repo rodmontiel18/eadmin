@@ -12,7 +12,7 @@ import {
   selectPeriodById,
   setIncome,
   setUserIncomeAction,
-} from '../../app/redux/period/periodSlice';
+} from '../../app/redux/period';
 
 interface IncomeFormType {
   amount: number;

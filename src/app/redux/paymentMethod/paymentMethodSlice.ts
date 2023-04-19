@@ -1,9 +1,14 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../../models/api';
 import { PaymentMethod } from '../../../models/paymentMethods';
 import { RequestActions } from '../../../models/util';
-import { RootState } from '../../store';
-import { getExtraReducers } from '../generic';
+import {
+  addUserPaymentMethodAction,
+  COLLECTION_NAME,
+  deleteUserPaymentMethodAction,
+  getUserPaymentMethodsAction,
+  setUserPaymentMethodAction,
+} from './paymentActions';
 
 interface PaymentMethodState {
   action: RequestActions;
@@ -18,15 +23,6 @@ const initialState: PaymentMethodState = {
   error: false,
   requestStatus: RequestStatus.IDLE,
 };
-
-const COLLECTION_NAME = 'paymentMethod';
-
-export const {
-  addUserItemAction: addUserPaymentMethodAction,
-  deleteUserItemAction: deleteUserPaymentMethodAction,
-  getUserItemsAction: getUserPaymentMethodsAction,
-  setUserItemAction: setUserPaymentMethodAction,
-} = getExtraReducers<PaymentMethod>(COLLECTION_NAME);
 
 export const paymentMethodSlice = createSlice({
   initialState,
@@ -157,27 +153,5 @@ export const paymentMethodSlice = createSlice({
 
 export const { finishRequest, setError, setPaymentMethod } =
   paymentMethodSlice.actions;
-
-const getPaymentMethodState = (state: RootState) => state.paymentMethod;
-
-export const selectAction = createSelector(
-  getPaymentMethodState,
-  p => p.action
-);
-export const selectPaymentMethods = createSelector(getPaymentMethodState, p => {
-  const sortedPaymentMethods = (
-    p.paymentMethods ? [...p.paymentMethods] : []
-  )?.sort((a: PaymentMethod, b: PaymentMethod) => a.name.localeCompare(b.name));
-  return sortedPaymentMethods;
-});
-export const selectError = createSelector(getPaymentMethodState, p => p.error);
-export const selectPaymentMethod = createSelector(
-  getPaymentMethodState,
-  p => p.paymentMethod
-);
-export const selectRequestStatus = createSelector(
-  getPaymentMethodState,
-  p => p.requestStatus
-);
 
 export default paymentMethodSlice.reducer;

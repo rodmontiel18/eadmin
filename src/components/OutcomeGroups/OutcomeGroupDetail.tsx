@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
 import OutcomeList from '../Outcomes/OutcomeList';
-import { selectUser, setLoading } from '../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../app/redux/app';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Link, useParams } from 'react-router-dom';
 import {
   getUserOutcomeGroupsAction,
   selectError,
   selectOutcomeGroupById,
-} from '../../app/redux/outcomeGroup/outcomeGroupSlice';
+} from '../../app/redux/outcomeGroup';
 import {
   getUserCategoriesAction,
   selectCategories,
-} from '../../app/redux/category/categorySlice';
+} from '../../app/redux/category';
 import { notification } from 'antd';
 
 import styles from '../../styles/outcomeGroup.module.scss';

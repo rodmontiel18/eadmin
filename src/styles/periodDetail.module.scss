@@ -1,0 +1,66 @@
+.periodDContainer {
+  padding: 10px 10px 100px 10px;
+  margin: 0 auto;
+  width: calc(100% - 85px);
+  .periodDates {
+    margin: 0 auto;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .periodDOutcomesListC,
+  .periodDIncomesListC {
+    padding: 5px;
+  }
+
+  .periodStickyBar {
+    position: sticky;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    top: calc(50% - 36px);
+    z-index: 99;
+    height: 0;
+    align-items: center;
+    .prev,
+    .next {
+      background-color: #fff;
+      border: rgb(198, 197, 197) solid 1px;
+      cursor: pointer;
+      font-size: 40px;
+      padding: 5px;
+      position: relative;
+    }
+    .prev {
+      border-radius: 8px 0 0 8px;
+      left: -55px;
+    }
+    .next {
+      border-radius: 0 8px 8px 0;
+      right: -55px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .periodDContainer {
+    width: 100%;
+    .periodStickyBar {
+      top: 38px;
+      .prev,
+      .next {
+        font-size: 32px;
+      }
+      .prev {
+        left: 40px;
+      }
+      .next {
+        right: 40px;
+      }
+    }
+    .periodDates {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 250px;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { Layout as AntLayout, Spin } from 'antd';
 import Cookies from 'js-cookie';
-import React, { MouseEvent, useEffect } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 import { auth } from '../../firebase/firebaseConfig';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
@@ -10,7 +10,7 @@ import {
   selectUser,
   setMenuCollapsed,
   setUser,
-} from '../../app/redux/app/appSlice';
+} from '../../app/redux/app';
 import { AuxProps } from '../../common/commonTypes';
 import HeaderMenu from '../HeaderMenu/HeaderMenu';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -26,12 +26,26 @@ const Layout: React.FC<AuxProps> = () => {
   const user = useAppSelector(selectUser);
   const cookieToken = Cookies.get('token');
   const collapsed = useAppSelector(selectMenuCollapsed);
+  const [collapsedWidth, setCollapsedWidth] = useState(0);
 
   const toggleCollapsed = () => {
     dispatch(setMenuCollapsed(!collapsed));
   };
 
+  const recalculateWidth = () => {
+    const windowWidth = window.innerWidth;
+    const deviceType = windowWidth < 481 ? 'mobile' : getDeviceType();
+    if (deviceType !== 'mobile') {
+      setCollapsedWidth(55);
+    } else {
+      setCollapsedWidth(0);
+    }
+  };
+
   useEffect(() => {
+    const windowWidth = window.innerWidth;
+    const deviceType = windowWidth < 481 ? 'mobile' : getDeviceType();
+    setCollapsedWidth(deviceType !== 'mobile' ? 55 : 0);
     const unsuscribe = auth.onAuthStateChanged(async user => {
       if (user) {
         const token = await user.getIdToken();
@@ -60,7 +74,12 @@ const Layout: React.FC<AuxProps> = () => {
       }
     });
 
-    return () => unsuscribe();
+    window.addEventListener('resize', recalculateWidth);
+
+    return () => {
+      window.removeEventListener('resize', recalculateWidth);
+      return unsuscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -91,30 +110,29 @@ const Layout: React.FC<AuxProps> = () => {
                   <>
                     <AntLayout>
                       <AntLayout.Content>
-                        <div className="root-content-container">
-                          <Outlet />
+                        <div className={styles.rootContentContainer}>
+                          <div className={styles.wrapperContainer}>
+                            <Outlet />
+                          </div>
                         </div>
                       </AntLayout.Content>
                     </AntLayout>
-                    <div
+                    <AntLayout.Sider
+                      theme="light"
+                      collapsible
+                      collapsed={collapsed}
+                      collapsedWidth={collapsedWidth}
+                      trigger={null}
                       onClick={(e: MouseEvent) => {
                         e.preventDefault();
                         e.stopPropagation();
                       }}
                     >
-                      <AntLayout.Sider
-                        theme="light"
-                        collapsible
+                      <HeaderMenu
                         collapsed={collapsed}
-                        collapsedWidth={getDeviceType() === 'desktop' ? 55 : 0}
-                        trigger={null}
-                      >
-                        <HeaderMenu
-                          collapsed={collapsed}
-                          toggleCollapsed={toggleCollapsed}
-                        />
-                      </AntLayout.Sider>
-                    </div>
+                        toggleCollapsed={toggleCollapsed}
+                      />
+                    </AntLayout.Sider>
                   </>
                 )}
               </AntLayout>

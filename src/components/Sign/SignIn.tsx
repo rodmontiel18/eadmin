@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../app/hooks';
-import { login, setLoading } from '../../app/redux/app/appSlice';
+import { login, setLoading } from '../../app/redux/app';
 import styles from '../../styles/signin.module.scss';
 
 interface SigninFormModel {

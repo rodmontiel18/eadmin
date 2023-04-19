@@ -1,31 +1,20 @@
-import {
-  createAsyncThunk,
-  createSelector,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit';
-import {
-  addDoc,
-  collection,
-  CollectionReference,
-  deleteDoc,
-  doc,
-  DocumentReference,
-  getDocs,
-  query,
-  setDoc,
-  where,
-  writeBatch,
-} from 'firebase/firestore';
-import { db } from '../../../firebase/firebaseConfig';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { RequestStatus } from '../../../models/api';
-import { BaseResponse } from '../../../models/api/base';
 import { Outcome } from '../../../models/outcome';
 import { OutcomeGroup } from '../../../models/outcomeGroup/OutcomeGroup';
 import { RequestActions } from '../../../models/util';
-import { genericDataConverter } from '../../../util/firestore';
-import { RootState } from '../../store';
-import { AsyncThunkConfig, getExtraReducers, InputParams } from '../generic';
+import {
+  addUserOutcomeAction,
+  addUserOutcomeGroupAction,
+  COLLECTION_NAME,
+  deleteUserOutcomeAction,
+  deleteUserOutcomeGroupAction,
+  getUserOutcomeGroupsAction,
+  getUserOutcomesAction,
+  setUserOutcomeAction,
+  setUserOutcomeGroupAction,
+} from './outcomeGroupActions';
 
 interface OutcomeGroupState {
   action: RequestActions;
@@ -42,197 +31,6 @@ const initialState: OutcomeGroupState = {
   error: false,
   requestStatus: RequestStatus.IDLE,
 };
-
-const COLLECTION_NAME = 'outcomeGroup';
-const OUTCOME_COLLECTION_NAME = 'outcome';
-
-const getCollection = (parentItemId: string): CollectionReference<Outcome> => {
-  return collection(
-    db,
-    COLLECTION_NAME,
-    parentItemId,
-    OUTCOME_COLLECTION_NAME
-  ).withConverter(genericDataConverter<Outcome>());
-};
-
-export const addUserOutcomeAction = createAsyncThunk<
-  BaseResponse<Outcome>,
-  InputParams<Outcome>,
-  AsyncThunkConfig
->(
-  `${COLLECTION_NAME}/${OUTCOME_COLLECTION_NAME}/addUser${COLLECTION_NAME}`,
-  async (params: InputParams<Outcome>) => {
-    const resp: BaseResponse<Outcome> = {
-      error: '',
-      status: 500,
-    };
-    try {
-      if (params.entity && params.parentItemId) {
-        const outcomeCollection = getCollection(params.parentItemId);
-        const snapOutcome = (await addDoc(
-          outcomeCollection,
-          params.entity
-        )) as DocumentReference<Outcome>;
-        if (snapOutcome?.id) {
-          resp.entity = { ...params.entity, id: snapOutcome.id };
-          resp.status = 200;
-        } else {
-          resp.error = 'Not found';
-          resp.status = 404;
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      resp.error = `${error}`;
-    }
-    return resp;
-  }
-);
-
-export const deleteUserOutcomeAction = createAsyncThunk<
-  BaseResponse<Outcome>,
-  InputParams<Outcome>,
-  AsyncThunkConfig
->(
-  `${COLLECTION_NAME}/${OUTCOME_COLLECTION_NAME}/deleteUser${OUTCOME_COLLECTION_NAME}`,
-  async (params: InputParams<Outcome>) => {
-    const resp: BaseResponse<Outcome> = {
-      error: '',
-      status: 500,
-    };
-    try {
-      if (params.parentItemId) {
-        const outcomeCollection = getCollection(params.parentItemId);
-        await deleteDoc(doc(outcomeCollection, params.entityId));
-        resp.status = 200;
-        resp.entityId = params.entityId;
-      }
-    } catch (error) {
-      console.error(error);
-      resp.error = `${error}`;
-    }
-    return resp;
-  }
-);
-
-export const getUserOutcomesAction = createAsyncThunk<
-  BaseResponse<Outcome>,
-  InputParams<Outcome>,
-  AsyncThunkConfig
->(
-  `${COLLECTION_NAME}/${OUTCOME_COLLECTION_NAME}/getUser${COLLECTION_NAME}`,
-  async (params: InputParams<Outcome>) => {
-    const resp: BaseResponse<Outcome> = {
-      error: '',
-      status: 500,
-    };
-    try {
-      if (params.parentItemId) {
-        const outcomeCollection = getCollection(params.parentItemId);
-        const items: Outcome[] = [];
-        const querySnap = await getDocs(
-          query(outcomeCollection, where('userId', '==', params.userId))
-        );
-        resp.status = 200;
-        if (!querySnap.empty) {
-          querySnap.forEach(itemSnap => {
-            if (itemSnap.exists())
-              items.push({ ...itemSnap.data(), id: itemSnap.id });
-          });
-        }
-        resp.entity = items;
-      }
-    } catch (error) {
-      console.error(error);
-      resp.error = `${error}`;
-    }
-    return resp;
-  }
-);
-
-export const setUserOutcomeAction = createAsyncThunk<
-  BaseResponse<Outcome>,
-  InputParams<Outcome>,
-  AsyncThunkConfig
->(
-  `${COLLECTION_NAME}/${OUTCOME_COLLECTION_NAME}/setUser${COLLECTION_NAME}`,
-  async (params: InputParams<Outcome>) => {
-    const resp: BaseResponse<Outcome> = {
-      error: '',
-      status: 500,
-    };
-    try {
-      if (params.entity && params.parentItemId) {
-        const outcomeCollection = getCollection(params.parentItemId);
-        await setDoc(
-          doc(outcomeCollection, params.entityId),
-          { ...params.entity },
-          { merge: true }
-        );
-        resp.entity = { ...params.entity };
-        resp.status = 200;
-      }
-    } catch (error) {
-      console.error(error);
-      resp.error = `${error}`;
-    }
-    return resp;
-  }
-);
-
-export const deleteUserOutcomeGroupAction = createAsyncThunk<
-  BaseResponse<OutcomeGroup>,
-  string,
-  AsyncThunkConfig
->(
-  `${COLLECTION_NAME}/deleteUser${COLLECTION_NAME}`,
-  async (outcomeGroupId, { getState }) => {
-    const resp: BaseResponse<OutcomeGroup> = {
-      error: '',
-      status: 500,
-    };
-    try {
-      const outcomeCollection = getCollection(outcomeGroupId);
-      const state = getState();
-      const { outcomes } = state.outcomeGroup;
-      const { user } = state.app;
-      const groupOutcomes = outcomes?.filter(o => o.groupId === outcomeGroupId);
-      const batch = writeBatch(db);
-      if (groupOutcomes && groupOutcomes.length > 0) {
-        groupOutcomes.forEach(o => {
-          const oRef = doc(outcomeCollection, `${o.id}`);
-          batch.delete(oRef);
-        });
-      } else {
-        const outcomesSnap = await getDocs(
-          query(outcomeCollection, where('userId', '==', user?.uid))
-        );
-        if (!outcomesSnap.empty) {
-          outcomesSnap.forEach(outcomeSnap => {
-            const oRef = doc(outcomeCollection, outcomeSnap.id);
-            batch.delete(oRef);
-          });
-        }
-      }
-      const periodRef = doc(db, COLLECTION_NAME, outcomeGroupId);
-      if (periodRef.id) batch.delete(periodRef);
-      await batch.commit();
-      resp.status = 200;
-      resp.entityId = outcomeGroupId;
-    } catch (error) {
-      resp.error = `${error}`;
-      console.log(error);
-    }
-    return resp;
-  }
-);
-
-export const {
-  addUserItemAction: addUserOutcomeGroupAction,
-  getUserItemByIdAction: getUserOutcomeGroupByIdAction,
-  getUserItemsAction: getUserOutcomeGroupsAction,
-  setUserItemAction: setUserOutcomeGroupAction,
-} = getExtraReducers<OutcomeGroup>(COLLECTION_NAME);
 
 export const outcomeGroupSlice = createSlice({
   initialState,
@@ -470,44 +268,4 @@ export const outcomeGroupSlice = createSlice({
 
 export const { finishRequest, setError, setOutcome, setOutcomeGroup } =
   outcomeGroupSlice.actions;
-
-const getOutcomeGroupState = (state: RootState) => state.outcomeGroup;
-
-export const selectAction = createSelector(getOutcomeGroupState, o => o.action);
-export const selectOutcome = createSelector(
-  getOutcomeGroupState,
-  p => p.outcome
-);
-export const selectOutcomeGroups = createSelector(getOutcomeGroupState, o => {
-  const sortedGroups = (o.outcomeGroups ? [...o.outcomeGroups] : [])?.sort(
-    (a: OutcomeGroup, b: OutcomeGroup) => a.name.localeCompare(b.name)
-  );
-  if (sortedGroups.length < 1) return undefined;
-  return sortedGroups;
-});
-export const selectOutcomesByGroupId = (outcomeGroupId: string) =>
-  createSelector(getOutcomeGroupState, p => {
-    const filteredOutcomes = (p.outcomes ? [...p.outcomes] : [])
-      ?.filter(o => o.groupId === outcomeGroupId)
-      ?.sort(
-        (a: Outcome, b: Outcome) =>
-          (a?.outcomeDate?.unix() || 0) - (b?.outcomeDate?.unix() || 0)
-      );
-    if (filteredOutcomes.length < 1) return undefined;
-    return filteredOutcomes;
-  });
-export const selectError = createSelector(getOutcomeGroupState, o => o.error);
-export const selectOutcomeGroup = createSelector(
-  getOutcomeGroupState,
-  o => o.outcomeGroup
-);
-export const selectOutcomeGroupById = (outcomeGroupId: string) =>
-  createSelector(getOutcomeGroupState, o =>
-    o.outcomeGroups?.find(o => o.id === outcomeGroupId)
-  );
-export const selectRequestStatus = createSelector(
-  getOutcomeGroupState,
-  o => o.requestStatus
-);
-
 export default outcomeGroupSlice.reducer;

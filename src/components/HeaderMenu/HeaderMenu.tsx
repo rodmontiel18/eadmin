@@ -12,7 +12,7 @@ import {
 
 import styles from '../../styles/menu.module.scss';
 import { useAppDispatch } from '../../app/hooks';
-import { logout } from '../../app/redux/app/appSlice';
+import { logout } from '../../app/redux/app';
 import { getDeviceType } from '../../util/util';
 
 interface HeaderMenuProps {

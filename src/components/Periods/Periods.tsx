@@ -1,14 +1,14 @@
 import { notification, Tabs } from 'antd';
 import { FC, useEffect, useState } from 'react';
 import { OutcomeTabs } from '../../models/outcome';
-import PeriodList from './PeriodList';
+import PeriodList from './PeriodList/PeriodList';
 
 import styles from '../../styles/periods.module.scss';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser, setLoading } from '../../app/redux/app/appSlice';
+import { selectUser, setLoading } from '../../app/redux/app';
 import { ParamKeyValuePair, useSearchParams } from 'react-router-dom';
-import { selectError } from '../../app/redux/period/periodSlice';
-import OutcomeGroupList from '../OutcomeGroups/OutcomeGroupList';
+import { selectError } from '../../app/redux/period';
+import OutcomeGroupList from '../OutcomeGroups/OutcomeGroupList/OutcomeGroupList';
 
 const Periods: FC = () => {
   const [activeTab, setActiveTab] = useState<OutcomeTabs>(OutcomeTabs.Periods);

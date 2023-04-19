@@ -1,7 +1,11 @@
 .innerPeriodListC {
+  width: 100%;
   .periodListContainer {
-    overflow: auto;
-    padding: 0 0 0 5px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 0 20px;
 
     [class~='ant-row'] {
       width: 100%;
@@ -9,25 +13,6 @@
     .closedPeriod {
       background-color: #6ed36e;
       border-color: #000;
-    }
-  }
-
-  .actionsContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    position: fixed;
-    bottom: 22px;
-    max-width: 1200px;
-    width: 100%;
-
-    .addIcon span {
-      background-color: #d3d3d3;
-      border-radius: 50%;
-      color: #2591fc;
-      font-size: 48px;
-      padding: 5px;
-      margin-right: 22px;
     }
   }
 
@@ -97,8 +82,7 @@
   }
 }
 
-.periodsContainer,
-.periodDContainer {
+.periodsContainer {
   padding: 10px 10px 100px 10px;
 }
 
@@ -106,13 +90,6 @@
   height: 100%;
   [class~='ant-tabs'] {
     height: 100%;
-  }
-}
-
-.periodDContainer {
-  .periodDOutcomesListC,
-  .periodDIncomesListC {
-    padding: 5px;
   }
 }
 

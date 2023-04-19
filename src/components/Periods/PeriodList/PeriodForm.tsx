@@ -4,21 +4,22 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
   notification,
   Switch,
 } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { Moment } from 'moment';
 import { FC, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectUser } from '../../app/redux/app/appSlice';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { selectUser } from '../../../app/redux/app';
 import {
   addUserPeriodAction,
   setError,
   setPeriod,
   setUserPeriodAction,
-} from '../../app/redux/period/periodSlice';
-import { Period } from '../../models/period/Period';
+} from '../../../app/redux/period';
+import { Period } from '../../../models/period/Period';
 
 interface PeriodFormProps {
   period?: Period;
@@ -94,49 +95,61 @@ const PeriodForm: FC<PeriodFormProps> = ({
   };
 
   return (
-    <Form
-      autoComplete="off"
-      form={form}
-      labelCol={{ span: 6 }}
-      name="period"
-      onFinish={handleOnSubmit}
-      wrapperCol={{ span: 18 }}
+    <Modal
+      centered
+      closable
+      destroyOnClose
+      footer={null}
+      onCancel={() => {
+        setShowPeriodForm(false);
+      }}
+      title={`${period ? 'Edit' : 'Add new'} period`}
+      visible
     >
-      <Form.Item
-        label="Name"
-        name="name"
-        rules={[{ required: true, message: 'Name is mandatory' }]}
+      <Form
+        autoComplete="off"
+        form={form}
+        labelCol={{ span: 6 }}
+        name="period"
+        onFinish={handleOnSubmit}
+        wrapperCol={{ span: 18 }}
       >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        label="Range dates"
-        name="rangeDates"
-        rules={[{ required: true, message: 'Range date is mandatory' }]}
-      >
-        <DatePicker.RangePicker inputReadOnly size="small" />
-      </Form.Item>
-      <Form.Item label="Outcome limit" name="outcomeLimit">
-        <InputNumber />
-      </Form.Item>
-      <Form.Item label="Period closed" name="closed" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button
-          htmlType="button"
-          onClick={() => {
-            setShowPeriodForm(false);
-          }}
-          style={{ marginRight: 10 }}
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: 'Name is mandatory' }]}
         >
-          Cancel
-        </Button>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Range dates"
+          name="rangeDates"
+          rules={[{ required: true, message: 'Range date is mandatory' }]}
+        >
+          <DatePicker.RangePicker inputReadOnly size="small" />
+        </Form.Item>
+        <Form.Item label="Outcome limit" name="outcomeLimit">
+          <InputNumber />
+        </Form.Item>
+        <Form.Item label="Period closed" name="closed" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button
+            htmlType="button"
+            onClick={() => {
+              setShowPeriodForm(false);
+            }}
+            style={{ marginRight: 10 }}
+          >
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
 

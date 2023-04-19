@@ -21,7 +21,8 @@
     "react",
     "react-hooks",
     "@typescript-eslint",
-    "prettier"
+    "prettier",
+    "unused-imports"
   ],
   "settings": {
     "import/resolver": {
@@ -45,6 +46,17 @@
     "import/prefer-default-export": "off",
     "import/extensions": "off",
     "default-param-last": "warn",
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
   }
 }
